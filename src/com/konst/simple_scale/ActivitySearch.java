@@ -10,6 +10,8 @@ import android.content.*;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import com.konst.module.Module;
+import com.konst.module.OnEventConnectResult;
 import com.konst.module.ScaleModule;
 
 import java.util.ArrayList;
@@ -17,12 +19,12 @@ import java.util.ArrayList;
 public class ActivitySearch extends Activity implements View.OnClickListener {
 
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
-    private BluetoothAdapter bluetooth; //блютуз адаптер
     private ArrayList<BluetoothDevice> foundDevice; //чужие устройства
     private ArrayAdapter<BluetoothDevice> bluetoothAdapter; //адаптер имён
     private IntentFilter intentFilter; //фильтр намерений
     private ListView listView; //список весов
     private TextView textViewLog; //лог событий
+    ScaleModule scaleModule;
 
     //private LinearLayout linearScreen;//лайаут для экрана показывать когда загрузились настройки
 
@@ -36,10 +38,16 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-            if (bluetooth.isDiscovering()) {
+            /*if (bluetooth.isDiscovering()) {
                 bluetooth.cancelDiscovery();
+            }*/
+            try {
+                scaleModule.init((BluetoothDevice) foundDevice.toArray()[i]);
+                scaleModule.attach();
+            } catch (Exception e) {
+                foundDevice.remove(i);
+                bluetoothAdapter.notifyDataSetChanged();
             }
-            scaleModule.init(Main.packageInfo.versionName, (BluetoothDevice) foundDevice.toArray()[i]);
         }
     };
 
@@ -58,7 +66,14 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
 
         //Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         textViewLog = (TextView) findViewById(R.id.textLog);
-        bluetooth = BluetoothAdapter.getDefaultAdapter();
+        //bluetooth = BluetoothAdapter.getDefaultAdapter();
+
+        try {
+            scaleModule = new ScaleModule(Main.packageInfo.versionName, onEventConnectResult);
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            finish();
+        }
 
         broadcastReceiver = new BroadcastReceiver() {
 
@@ -116,19 +131,10 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         intentFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
         registerReceiver(broadcastReceiver, intentFilter);
 
-        if (bluetooth != null) {
-            if (bluetooth.isEnabled()) {
-                log(R.string.bluetooth_on, true);
-            } else {
-                log(R.string.bluetooth_off, true);
-                bluetooth.enable();
-            }
-        }
-
         foundDevice = new ArrayList<>();
 
         for (int i = 0; Preferences.contains(ActivityPreferences.KEY_ADDRESS + i); i++) { //заполнение списка
-            foundDevice.add(bluetooth.getRemoteDevice(Preferences.read(ActivityPreferences.KEY_ADDRESS + i, "")));
+            foundDevice.add(scaleModule.getAdapter().getRemoteDevice(Preferences.read(ActivityPreferences.KEY_ADDRESS + i, "")));
         }
         bluetoothAdapter = new BluetoothListAdapter(this, foundDevice);
 
@@ -140,7 +146,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         listView.setOnItemClickListener(onItemClickListener);
 
         if (foundDevice.isEmpty()) {
-            bluetooth.startDiscovery();
+            scaleModule.getAdapter().startDiscovery();
         }
         /*String msg = "0503285426 coffa=0.25687 coffb gogusr=kreogen.lg@gmail.com gogpsw=htcehc25";
         String str = encodeMessage(msg);
@@ -154,8 +160,8 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
 
     //==================================================================================================================
     private void exit() {
-        if (bluetooth.isDiscovering()) {
-            bluetooth.cancelDiscovery();
+        if (scaleModule.getAdapter().isDiscovering()) {
+            scaleModule.getAdapter().cancelDiscovery();
         }
         unregisterReceiver(broadcastReceiver);
 
@@ -196,7 +202,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
                 registerReceiver(broadcastReceiver, new IntentFilter());
                 unregisterReceiver(broadcastReceiver);
                 registerReceiver(broadcastReceiver, intentFilter);
-                bluetooth.startDiscovery();
+                scaleModule.getAdapter().startDiscovery();
             break;
             case R.id.exit:
                 //onDestroy();
@@ -205,6 +211,25 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
             default:
         }
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            /*case R.id.buttonMenu:
+                openOptionsMenu();
+                break;*/
+            case R.id.buttonBack:
+                onBackPressed();
+                break;
+            case R.id.buttonSearchBluetooth:
+                registerReceiver(broadcastReceiver, new IntentFilter());
+                unregisterReceiver(broadcastReceiver);
+                registerReceiver(broadcastReceiver, intentFilter);
+                scaleModule.getAdapter().startDiscovery();
+                break;
+            default:
+        }
     }
 
     //==================================================================================================================
@@ -230,31 +255,12 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         textViewLog.setText(getString(resource) + ' ' + str + '\n' + textViewLog.getText());
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            /*case R.id.buttonMenu:
-                openOptionsMenu();
-                break;*/
-            case R.id.buttonBack:
-                onBackPressed();
-                break;
-            case R.id.buttonSearchBluetooth:
-                registerReceiver(broadcastReceiver, new IntentFilter());
-                unregisterReceiver(broadcastReceiver);
-                registerReceiver(broadcastReceiver, intentFilter);
-                bluetooth.startDiscovery();
-                break;
-            default:
-        }
-    }
-
-    public final ScaleModule scaleModule = new ScaleModule() {
+    OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
         AlertDialog.Builder dialog;
         private ProgressDialog dialogSearch;
 
         @Override
-        public void handleResultConnect(final ResultConnect result) {
+        public void handleResultConnect(Module.ResultConnect result) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -293,7 +299,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         }
 
         @Override
-        public void handleConnectError(final ResultError error, final String s) {
+        public void handleConnectError(Module.ResultError error, String s) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -355,7 +361,6 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
                 }
             });
         }
-
     };
 
 }

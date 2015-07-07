@@ -161,45 +161,6 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
         }
     }
 
-    /*class PreferenceUpdate implements InterfacePreference {
-
-        @Override
-        public void setup(Preference name) throws Exception {
-            if (ScaleModule.getVersion() != null) {
-                if (ScaleModule.getNumVersion() < Main.microSoftware) {
-                    name.setSummary(getString(R.string.Is_new_version));
-                    name.setEnabled(true);
-                } else {
-                    name.setSummary(getString(R.string.Scale_update));
-                    name.setEnabled(false);
-                }
-
-                name.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                    //@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                    @Override
-                    public boolean onPreferenceClick(Preference preference) {
-                        //Scales.vScale.backupPreference();
-                        String hardware = ScaleModule.getModuleHardware();
-                        if (hardware.isEmpty()) {
-                            hardware = "MBC04.36.2";
-                        }
-                        Intent intent = new Intent(ActivityPreferences.this, ActivityBootloader.class);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        else
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra(KEY_ADDRESS, ScaleModule.getAddressBluetoothDevice());
-                        intent.putExtra(InterfaceVersions.CMD_HARDWARE, hardware);
-                        intent.putExtra(InterfaceVersions.CMD_VERSION, ScaleModule.getNumVersion());
-                        startActivity(intent);
-                        return false;
-                    }
-                });
-            }
-        }
-    }*/
-
     class PreferenceTimer implements InterfacePreference {
 
         @Override
@@ -330,53 +291,6 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
             });
         }
     }
-
-    /*class PreferenceDayClosedCheck implements InterfacePreference {
-
-        @Override
-        public void setup(Preference name) throws Exception {
-            name.setTitle(getString(R.string.closed_checks) + ' ' + CheckTable.day_closed + ' ' + getString(R.string.day));
-            name.setSummary(getString(R.string.sum_closed_checks));
-            name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object o) {
-                    if (o.toString().isEmpty() || "0".equals(o.toString()) || Integer.valueOf(o.toString()) > Main.default_day_close_check) {
-                        Toast.makeText(getBaseContext(), R.string.preferences_no, Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-
-                    CheckTable.day_closed = Integer.valueOf(o.toString());
-                    preference.setTitle(getString(R.string.closed_checks) + ' ' + CheckTable.day_closed + ' ' + getString(R.string.day));
-                    Preferences.write(KEY_DAY_CLOSED_CHECK, CheckTable.day_closed);
-                    Toast.makeText(getBaseContext(), getString(R.string.preferences_yes) + ' ' + CheckTable.day_closed + ' ' + getString(R.string.day), Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            });
-        }
-    }*/
-
-    /*class PreferenceDayCheckDelete implements InterfacePreference {
-
-        @Override
-        public void setup(Preference name) throws Exception {
-            name.setTitle(getString(R.string.sum_delete_check) + ' ' + String.valueOf(CheckTable.day) + ' ' + getString(R.string.day));
-            name.setSummary(getString(R.string.sum_removing_checks));
-            name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object o) {
-                    if (o.toString().isEmpty() || "0".equals(o.toString()) || Integer.valueOf(o.toString()) > Main.default_day_delete_check) {
-                        Toast.makeText(getBaseContext(), R.string.preferences_no, Toast.LENGTH_SHORT).show();
-                        return false;
-                    }
-                    CheckTable.day = Integer.valueOf(o.toString());
-                    preference.setTitle(getString(R.string.sum_delete_check) + ' ' + String.valueOf(CheckTable.day) + ' ' + getString(R.string.day));
-                    Preferences.write(KEY_DAY_CHECK_DELETE, CheckTable.day);
-                    Toast.makeText(getBaseContext(), R.string.preferences_yes, Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            });
-        }
-    }*/
 
     class PreferenceAbout implements InterfacePreference {
 
@@ -684,20 +598,6 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
             });
         }*/
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        /*if (flagChange) {
-            try {
-                long entryID = Long.parseLong(new PreferencesTable(this).insertAllEntry().getLastPathSegment());
-                new TaskTable(getApplicationContext()).insertNewTask(TaskCommand.TaskType.TYPE_PREF_SEND_SHEET_DISK, entryID, 0, "preferences");
-            } catch (Exception e) {
-            }
-            //startService(new Intent(this, ServiceGetDateServer.class).setAction("new_preference"));
-            //startService(new Intent(this, ServiceSentSheetServer.class).setAction("new_preference"));//todo временно отключен
-        }*/
     }
 
     @Override

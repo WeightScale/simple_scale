@@ -22,11 +22,6 @@
                                     android:inputType="number"/>
                 <EditTextPreference android:title="@string/auto_capture" android:key="auto_capture"
                                     android:inputType="number"/>
-                <EditTextPreference android:title="@string/removing_checks"
-                                    android:summary="@string/sum_removing_checks" android:key="day_check_delete"
-                                    android:inputType="number"/>
-                <EditTextPreference android:title="@string/closed_checks" android:summary="@string/sum_closed_checks"
-                                    android:key="day_closed_check" android:inputType="number"/>
             </PreferenceCategory>
         </PreferenceScreen>
         <EditTextPreference android:title="@string/filter_adc" android:summary="@string/sum_filter_adc"
