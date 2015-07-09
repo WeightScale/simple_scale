@@ -75,6 +75,7 @@ public class ActivityScales extends Activity implements View.OnClickListener{
         if (!autoWeight.isStart()) {
             new Thread(autoWeight).start();
         }
+        handlerWeight.start();
         screenUnlock();
     }
 
@@ -82,6 +83,7 @@ public class ActivityScales extends Activity implements View.OnClickListener{
     protected void onPause() {
         super.onPause();
         autoWeight.cancel();
+        handlerWeight.stop(true);
     }
 
     /**
@@ -139,18 +141,10 @@ public class ActivityScales extends Activity implements View.OnClickListener{
                             break;
                         case BluetoothDevice.ACTION_ACL_DISCONNECTED://устройство отсоеденено
                             vibrator.vibrate(200);
-                            /*listView.setOnItemClickListener(null);
-                            linearBatteryTemp.setVisibility(View.INVISIBLE);
-                            imageViewRemote.setImageDrawable(getResources().getDrawable(R.drawable.rss_off));
-                            imageNewCheck.setEnabled(false);*/
                             isScaleConnect = false;
                             break;
                         case BluetoothDevice.ACTION_ACL_CONNECTED://найдено соеденено
                             vibrator.vibrate(200);
-                            /*listView.setOnItemClickListener(onItemClickListener);
-                            linearBatteryTemp.setVisibility(View.VISIBLE);
-                            imageViewRemote.setImageDrawable(getResources().getDrawable(R.drawable.rss_on));
-                            imageNewCheck.setEnabled(true);*/
                             isScaleConnect = true;
                             break;
                         default:
@@ -165,9 +159,7 @@ public class ActivityScales extends Activity implements View.OnClickListener{
 
         try {
             scaleModule = new ScaleModule(Main.packageInfo.versionName, onEventConnectResult);
-            scaleModule.getAdapter().enable();
             Toast.makeText(getBaseContext(), R.string.bluetooth_off, Toast.LENGTH_SHORT).show();
-            while (!scaleModule.getAdapter().isEnabled()) ;//ждем включения bluetooth
             connectScaleModule(Preferences.read(ActivityPreferences.KEY_LAST_SCALES, ""));
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
@@ -411,10 +403,8 @@ public class ActivityScales extends Activity implements View.OnClickListener{
     }
 
     protected void exit() {
-        handlerWeight.stop(true);
         if (broadcastReceiver != null)
             unregisterReceiver(broadcastReceiver);
-        scaleModule.removeCallbacksAndMessages(null);
         scaleModule.dettach();
         scaleModule.getAdapter().disable();
         while (scaleModule.getAdapter().isEnabled()) ;
@@ -558,7 +548,8 @@ public class ActivityScales extends Activity implements View.OnClickListener{
          * @param what Результат статуса сообщения энумератор ResultWeight.
          * @param weight Данные веса в килограмах.
          * @param sensor Данные показания сенсорного датчика.
-         * @return Время обновления показаний в милисекундах.*/
+         * @return Время обновления показаний в милисекундах.
+         */
         @Override
         public int onEvent(final ScaleModule.ResultWeight what, final int weight, final int sensor) {
             runOnUiThread(new Runnable() {
@@ -593,12 +584,13 @@ public class ActivityScales extends Activity implements View.OnClickListener{
                             vibrator.vibrate(100);
                         break;
                         case WEIGHT_ERROR:
+                            moduleWeight = 0;
+                            moduleSensorValue = 0;
                             weightTextView.updateProgress(getString(R.string.NO_CONNECT), Color.BLACK, getResources().getDimension(R.dimen.text_large_x));
                             progressBarWeight.setProgress(0);
                         break;
                         default:
                     }
-
                 }
             });
             return 50; // Обновляем через милисикунды
@@ -753,7 +745,7 @@ public class ActivityScales extends Activity implements View.OnClickListener{
                         stringBuilder.append(msg.arg1 + getString(R.string.scales_kg)).append(" ");
 
                         stringBuilder.append("(").append(new SimpleDateFormat("dd.MM.yyyy").format(date)).append("--");
-                        stringBuilder.append(new SimpleDateFormat("HH:mm:ss").format(date)).append(")");
+                        stringBuilder.append(new SimpleDateFormat("HH:mm:ss").format(date)).append(")").append('\n');
 
                         log(stringBuilder.toString());
                         buttonFinish.setEnabled(true);

@@ -25,12 +25,6 @@ public class Main extends Application {
      * Версия пограммы весового модуля.
      */
     public static final int microSoftware = 4;
-    //protected static String networkOperatorName;
-    //protected static String simNumber;
-    //protected static String telephoneNumber;
-    //protected static String networkCountry;
-    //protected static int versionNumber;
-    //public static String versionName = "";
 
     /**
      * Шаг измерения (округление).
@@ -121,8 +115,6 @@ public class Main extends Application {
         try {
             PackageManager packageManager = getPackageManager();
             packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
-            //Main.versionNumber = packageInfo.versionCode;
-            //Main.versionName = packageInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {  }
 
         preferencesScale = new Preferences(getApplicationContext(), Preferences.PREFERENCES);
@@ -136,7 +128,6 @@ public class Main extends Application {
         ScaleModule.setTimerNull(Preferences.read(ActivityPreferences.KEY_TIMER_NULL, default_max_time_auto_null));
         ScaleModule.setWeightError(Preferences.read(ActivityPreferences.KEY_MAX_NULL, default_limit_auto_null));
         timeDelayDetectCapture = Preferences.read(ActivityPreferences.KEY_TIME_DELAY_DETECT_CAPTURE, 1);
-
     }
 
     @Override

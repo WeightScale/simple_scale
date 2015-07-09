@@ -4,7 +4,7 @@
         android:orientation="vertical"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" android:padding="@dimen/padding"
-        android:visibility="visible" android:id="@+id/searchScreen">
+        android:visibility="visible" android:id="@+id/searchScreen" android:background="@color/background_light">
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="fill_parent"
