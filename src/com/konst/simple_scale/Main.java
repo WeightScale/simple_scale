@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import com.konst.module.ScaleModule;
 
 /**
@@ -111,7 +112,7 @@ public class Main extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         try {
             PackageManager packageManager = getPackageManager();
             packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
@@ -121,13 +122,13 @@ public class Main extends Application {
         preferencesUpdate = new Preferences(getApplicationContext(), Preferences.PREF_UPDATE);
         Preferences.load(getSharedPreferences(Preferences.PREFERENCES, Context.MODE_PRIVATE)); //загрузить настройки
 
-        stepMeasuring = Preferences.read(ActivityPreferences.KEY_STEP, default_max_step_scale);
-        autoCapture = Preferences.read(ActivityPreferences.KEY_AUTO_CAPTURE, default_max_auto_capture);
-        day_delete = Preferences.read(ActivityPreferences.KEY_DAY_CHECK_DELETE, default_day_delete_check);
-        day_closed = Preferences.read(ActivityPreferences.KEY_DAY_CLOSED_CHECK, default_day_close_check);
-        ScaleModule.setTimerNull(Preferences.read(ActivityPreferences.KEY_TIMER_NULL, default_max_time_auto_null));
-        ScaleModule.setWeightError(Preferences.read(ActivityPreferences.KEY_MAX_NULL, default_limit_auto_null));
-        timeDelayDetectCapture = Preferences.read(ActivityPreferences.KEY_TIME_DELAY_DETECT_CAPTURE, 1);
+        stepMeasuring = Preferences.read(getString(R.string.KEY_STEP), default_max_step_scale);
+        autoCapture = Preferences.read(getString(R.string.KEY_AUTO_CAPTURE), default_max_auto_capture);
+        day_delete = Preferences.read(getString(R.string.KEY_DAY_CHECK_DELETE), default_day_delete_check);
+        day_closed = Preferences.read(getString(R.string.KEY_DAY_CLOSED_CHECK), default_day_close_check);
+        ScaleModule.setTimerNull(Preferences.read(getString(R.string.KEY_TIMER_NULL), default_max_time_auto_null));
+        ScaleModule.setWeightError(Preferences.read(getString(R.string.KEY_MAX_NULL), default_limit_auto_null));
+        timeDelayDetectCapture = Preferences.read(getString(R.string.KEY_TIME_DELAY_DETECT_CAPTURE), 1);
     }
 
     @Override

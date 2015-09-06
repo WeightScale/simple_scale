@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Простые Весы</string>
+    <string name="app_name">Весы </string>
     <string name="scales_kg">кг</string>
     <string name="OVER_LOAD">ПЕРЕГРУЗКА</string>
     <string name="NO_CONNECT">НЕТ СОЕДИНЕНИЯ</string>
@@ -184,7 +184,7 @@
     <string name="OK">OK</string>
     <!--<string name="search">" поиск…"</string>-->
     <string name="Error_connect">"Ошибка соединения"</string>
-    <string name="not_scale">" это не весы"</string>
+    <string name="not_scale">" это не весы "</string>
     <string name="Type">Тип</string>
     <string name="Enter_type">Введите Тип</string>
     <string name="TEXT_MESSAGE">Выключите весы. На весах нажмите кнопку включения и не отпускайте пока индикатор не

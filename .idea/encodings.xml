@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding" native2AsciiForPropertiesFiles="true">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/../ScaleModule/src/com/konst/module/OnEventConnectResult.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/assets/bootfiles/37894_mbc04.36.2_4.hex" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/res/drawable-hdpi/b_full.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/drawable-hdpi/b_full_r.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/drawable-hdpi/b_low.png" charset="UTF-8" />
@@ -13,7 +15,10 @@
     <file url="file://$PROJECT_DIR$/res/drawable/round_rectangle.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/drawable/round_rectangle_w.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/drawable/weight_progress.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/res/drawable/weight_progress_green.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/layout/about.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/res/layout/bootloder.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/res/layout/connect.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/layout/custom_progress_dialog.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/layout/list_item_bluetooth.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/layout/search.xml" charset="UTF-8" />
@@ -21,6 +26,7 @@
     <file url="file://$PROJECT_DIR$/res/menu/menu_search.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/values/colors.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/values/dimens.xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/res/values/key.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/values/styles.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/xml/preferences.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/xml/tuning.xml" charset="UTF-8" />
@@ -30,11 +36,15 @@
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivitySearch.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivityTuning.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/BluetoothListAdapter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/CustomTextView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/DialogFilterADC.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Internet.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Main.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Preferences.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/SimpleGestureFilter.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/WeightTextView.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/temp/exit.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/bootloader/ActivityBootloader.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/bootloader/ActivityConnect.java" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

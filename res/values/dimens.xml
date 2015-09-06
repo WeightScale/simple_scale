@@ -19,5 +19,5 @@
     <dimen name="width_battery">28sp</dimen>
     <dimen name="height_progress_weight">10dp</dimen>
     <dimen name="image_button_size">65dp</dimen>
-    <dimen name="title_size">30dip</dimen>
+    <dimen name="title_size">30dp</dimen>
 </resources>
