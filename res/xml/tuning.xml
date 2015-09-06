@@ -24,7 +24,7 @@
             <PreferenceCategory android:title="Ввод калибровочных данных">
                 <EditTextPreference android:title="Константа А"
                                     android:summary="Введите константу А которая была вычеслена при калибровке весов"
-                                    android:key="@string/KEY_COEFFICIENT_A" android:inputType="numberDecimal"/>
+                                    android:key="@string/KEY_COEFFICIENT_A" android:inputType="numberDecimal|numberSigned"/>
                 <EditTextPreference android:title="Константа B"
                                     android:summary="Введите константу В которая была вычеслена при калибровке весов"
                                     android:key="@string/KEY_COEFFICIENT_B" android:inputType="numberDecimal"/>

@@ -4,19 +4,29 @@
               android:paddingBottom="5dp"
               android:paddingTop="5dp"
               android:paddingLeft="5dp"
-              android:orientation="vertical"
+              android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:id="@+id/layout_item_bluetooth">
-    <TextView android:layout_height="wrap_content"
-              android:textSize="@dimen/text_micro"
-              android:layout_width="wrap_content"
-              android:id="@+id/bottomText"
-              android:textColor="@color/background1" android:focusable="false" android:focusableInTouchMode="false"
-              android:clickable="false"/>
-    <TextView android:layout_height="wrap_content"
-              android:textSize="@dimen/text_large"
-              android:layout_width="wrap_content"
-              android:text="" android:id="@+id/topText"
-              android:textColor="@color/background1" android:focusable="false" android:focusableInTouchMode="false"
-              android:clickable="false" android:textStyle="bold"/>
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent" android:layout_weight="1">
+        <TextView android:layout_height="wrap_content"
+                  android:textSize="@dimen/text_micro"
+                  android:layout_width="wrap_content"
+                  android:id="@+id/bottomText"
+                  android:textColor="@color/background1" android:focusable="false" android:focusableInTouchMode="false"
+                  android:clickable="false"/>
+        <TextView android:layout_height="wrap_content"
+                  android:textSize="@dimen/text_large"
+                  android:layout_width="wrap_content"
+                  android:text="" android:id="@+id/topText"
+                  android:textColor="@color/background1" android:focusable="false" android:focusableInTouchMode="false"
+                  android:clickable="false" android:textStyle="bold"/>
+    </LinearLayout>
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:id="@+id/imageButton" android:src="@drawable/ic_action_light_delete" android:clickable="true"
+            android:onClick="removeAtomPayOnClickHandler"/>
 </LinearLayout>

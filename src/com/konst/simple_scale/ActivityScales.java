@@ -9,6 +9,7 @@ import android.bluetooth.BluetoothDevice;
 import android.content.*;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -45,6 +46,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     private ListView listView;
     private ArrayList<WeightObject> arrayList;
     private ArrayAdapter<WeightObject> customListAdapter;
+    private ProgressBar progressBarStable;
     private ProgressBar progressBarWeight;
     private TextView weightTextView;
     private Drawable dProgressWeight, dWeightDanger;
@@ -105,7 +107,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     @Override
     protected void onStart() {
         super.onStart();
-        startThread();
     }
 
     @Override
@@ -330,6 +331,10 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         progressBarWeight.setMax(ScaleModule.getMarginTenzo());
         progressBarWeight.setSecondaryProgress(ScaleModule.getLimitTenzo());
 
+        progressBarStable = (ProgressBar)findViewById(R.id.progressBarStable);
+        progressBarStable.setMax(COUNT_STABLE);
+        progressBarStable.setSecondaryProgress(numStable = 0);
+
         //weightTextView = new TextView(this);
         weightTextView = (TextView) findViewById(R.id.weightTextView);
         //weightTextView.setMax(COUNT_STABLE);
@@ -356,7 +361,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
 
             @Override
             public void onDoubleTap() {
-                //weightTextView.setSecondaryProgress(0);
+                progressBarStable.setSecondaryProgress(0);
                 vibrator.vibrate(100);
                 new ZeroThread(ActivityScales.this).start();
             }
@@ -375,11 +380,12 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                     case MotionEvent.ACTION_MOVE:
                         touchWeightView = true;
                         vibrator.vibrate(5);
-                        int progress = (int) (event.getX() / (detectorWeightView.getSwipeMaxDistance() / 100/*weightTextView.getMax()*/));
-                        //weightTextView.setSecondaryProgress(progress);
+                        int progress = (int) (event.getX() / (detectorWeightView.getSwipeMaxDistance() / progressBarStable.getMax()));
+                        progressBarStable.setSecondaryProgress(progress);
                         break;
                     case MotionEvent.ACTION_UP:
                     case MotionEvent.ACTION_CANCEL:
+                        progressBarStable.setSecondaryProgress(0);
                         touchWeightView = false;
                         break;
                     default:
@@ -503,6 +509,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                             setupWeightView();
                             handlerWeight.start();
                             handlerBatteryTemperature.start();
+                            startThread();
                             break;
                         case STATUS_SCALE_UNKNOWN:
 
@@ -676,7 +683,16 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    textViewBattery.setText("заряд батареи " + battery + '%' + " t- " + temperature + '°' + 'C');
+                    if (battery > 15) {
+                        textViewBattery.setText("заряд батареи " + battery + '%' + " t- " + temperature + '°' + 'C');
+                        textViewBattery.setTextColor(Color.WHITE);
+                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery, 0, 0, 0);
+                    } else if (battery > 0) {
+                        textViewBattery.setText("заряд низкий!!! " + battery + '%' + " t- " + temperature + '°' + 'C');
+                        textViewBattery.setTextColor(Color.RED);
+                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery_red, 0, 0, 0);
+                    }
+
                 }
             });
             return 5; //Обновляется через секунд
@@ -709,11 +725,8 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 break;
             }
             tempWeight = moduleWeight;
-            if (isStable) {
+            if (isStable || weightViewIsSwipe) {
                 handler.obtainMessage(Action.STORE_WEIGHTING.ordinal(), moduleWeight, 0).sendToTarget();                 //сохраняем стабильный вес
-            }else if (weightViewIsSwipe){
-                handler.obtainMessage(Action.STORE_WEIGHTING.ordinal(), moduleWeight, 1).sendToTarget();
-                weightViewIsSwipe = false;
             }
 
             while (running && !((moduleWeight >= tempWeight + Main.default_min_auto_capture)
@@ -737,9 +750,10 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
 
             switch (Action.values()[msg.what]) {
                 case UPDATE_PROGRESS:
-                    //weightTextView.setSecondaryProgress(msg.arg1);
+                    progressBarStable.setSecondaryProgress(msg.arg1);
                     break;
                 case STORE_WEIGHTING:
+                    vibrator.vibrate(100);
                     /*StringBuilder stringBuilder = new StringBuilder();
                     Date date = new Date();
                     if(msg.arg2 == 0)
@@ -762,6 +776,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                     //buttonFinish.setEnabled(true);
                     //buttonFinish.setAlpha(255);
                     //((OnCheckEventListener) mTabsAdapter.getCurrentFragment()).someEvent();todo
+                    progressBarStable.setSecondaryProgress(0);
                     flagExit = true;
                     break;
                 case START_WEIGHTING:
@@ -868,6 +883,14 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         public String getDate() { return date;  }
 
         public String getTime() { return time;  }
+    }
+
+    public void removeAtomPayOnClickHandler(View view) {
+
+        //ListView list = getListView();
+        int position = listView.getPositionForView(view);
+        arrayList.remove(position);
+        customListAdapter.notifyDataSetChanged();
     }
 
 }

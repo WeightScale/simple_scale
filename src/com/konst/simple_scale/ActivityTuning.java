@@ -20,6 +20,8 @@ import com.konst.module.InterfaceVersions;
 import com.konst.module.ScaleModule;
 import com.konst.simple_scale.bootloader.ActivityBootloader;
 
+import java.math.BigDecimal;
+import java.security.Signer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,18 +145,18 @@ public class ActivityTuning extends PreferenceActivity {
     class CoefficientA implements InterfacePreference{
         @Override
         public void setup(Preference name) throws Exception {
-            name.setTitle(getString(R.string.ConstantA) + Float.toString(ScaleModule.getCoefficientA()));
+            name.setTitle(getString(R.string.ConstantA) + new BigDecimal(String.valueOf(ScaleModule.getCoefficientA())).toPlainString());
             name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     try {
                         ScaleModule.setCoefficientA(Float.valueOf(o.toString()));
-                        preference.setTitle(getString(R.string.ConstantA) + Float.toString(ScaleModule.getCoefficientA()));
+                        preference.setTitle(getString(R.string.ConstantA) + new BigDecimal(String.valueOf(ScaleModule.getCoefficientA())).toPlainString());
                         Toast.makeText(getApplicationContext(), R.string.preferences_yes, Toast.LENGTH_SHORT).show();
                         flag_restore = true;
                         return true;
                     } catch (Exception e) {
-                        Toast.makeText(getApplicationContext(), R.string.preferences_no, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), R.string.preferences_no + e.getMessage(), Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 }

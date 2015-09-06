@@ -112,7 +112,7 @@ public class Main extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        /*PreferenceManager.setDefaultValues(this, R.xml.preferences, false);*/
         try {
             PackageManager packageManager = getPackageManager();
             packageInfo = packageManager.getPackageInfo(getPackageName(), 0);

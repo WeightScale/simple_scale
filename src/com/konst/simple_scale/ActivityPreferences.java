@@ -65,6 +65,7 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
         mapPreferences.put(getString(R.string.KEY_ABOUT), new PreferenceAbout());
         mapPreferences.put(getString(R.string.KEY_ADMIN), new Admin());
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
        /* PreferenceManager preferenceManager = getPreferenceManager();
         preferenceManager.setSharedPreferencesName("my_preferences");

@@ -14,25 +14,36 @@
                       android:layout_height="wrap_content"
                       android:orientation="vertical"
                       android:background="@color/greenEnd">
-            <LinearLayout android:layout_width="fill_parent"
-                          android:layout_height="wrap_content"
-                          android:id="@+id/linearLayout"
-                          android:layout_gravity="center"
-                          android:orientation="horizontal">f
-                <com.konst.simple_scale.CustomTextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/weightTextView"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/text_big"
-                        android:gravity="center" android:clickable="true"/>
-                <!--<com.konst.simple_scale.WeightTextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="@dimen/text_big"
-                        android:id="@+id/weightTextView"
-                        android:interpolator="@android:anim/linear_interpolator" android:clickable="true"
-                        style="@style/CustomWeightTextViewGreen"/>-->
-            </LinearLayout>
+            <FrameLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+                <ProgressBar style="@android:style/Widget.ProgressBar.Horizontal" android:layout_width="match_parent"
+                             android:layout_height="@dimen/corners" android:id="@+id/progressBarStable"
+                             android:focusableInTouchMode="false"
+                             android:layout_marginLeft="@dimen/padding"
+                             android:layout_marginRight="@dimen/padding"
+                             android:progressDrawable="@drawable/progress_stable"
+                             android:layout_marginTop="@dimen/padding"/>
+                <LinearLayout android:layout_width="fill_parent"
+                              android:layout_height="wrap_content"
+                              android:id="@+id/linearLayout"
+                              android:layout_gravity="center"
+                              android:orientation="horizontal">f
+                    <com.konst.simple_scale.CustomTextView
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/weightTextView"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/text_big"
+                            android:gravity="center" android:clickable="true"/>
+                    <!--<com.konst.simple_scale.WeightTextView
+                            android:layout_width="fill_parent"
+                            android:layout_height="@dimen/text_big"
+                            android:id="@+id/weightTextView"
+                            android:interpolator="@android:anim/linear_interpolator" android:clickable="true"
+                            style="@style/CustomWeightTextViewGreen"/>-->
+                </LinearLayout>
+            </FrameLayout>
             <ProgressBar style="@android:style/Widget.ProgressBar.Horizontal"
                          android:layout_width="fill_parent"
                          android:layout_height="@dimen/height_progress_weight" android:id="@+id/progressBarWeight"
