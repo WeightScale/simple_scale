@@ -56,9 +56,11 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
         setContentView(R.layout.search);
 
         setTitle(getString(R.string.Search_scale)); //установить заголовок
+        setProgressBarIndeterminateVisibility(false);
 
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.screenBrightness = 1.0f;
@@ -255,7 +257,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         textViewLog.setText(getString(resource) + ' ' + str + '\n' + textViewLog.getText());
     }
 
-    OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
+    final OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
         AlertDialog.Builder dialog;
         private ProgressDialog dialogSearch;
 
@@ -282,12 +284,12 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
                             TextView tv1 = (TextView) dialogSearch.findViewById(R.id.textView1);
                             tv1.setText(getString(R.string.Connecting) + '\n' + ScaleModule.getNameBluetoothDevice());
 
-                            setProgressBarIndeterminateVisibility(true);
+                            //setProgressBarIndeterminateVisibility(true);
                             setTitle(getString(R.string.Connecting) + getString(R.string.app_name) + ' ' + ScaleModule.getNameBluetoothDevice()); //установить заголовок
                             break;
                         case STATUS_ATTACH_FINISH:
                             listView.setEnabled(true);
-                            setProgressBarIndeterminateVisibility(false);
+                            //setProgressBarIndeterminateVisibility(false);
                             if (dialogSearch.isShowing()) {
                                 dialogSearch.dismiss();
                             }

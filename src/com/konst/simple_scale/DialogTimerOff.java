@@ -10,22 +10,19 @@ import android.view.View;
  * @author Kostya
  */
 class DialogTimerOff extends DialogPreference /*implements ActivityPreferences.InterfacePreference*/ {
-    private int mNumber = 0;
-    private String[] intArray;
+    private int mNumber;
+    private final String[] intArray;
     private NumberPicker numberPicker;
-    int minValue;
-    int maxValue;
+    final int minValue;
+    final int maxValue;
 
     public DialogTimerOff(Context context, AttributeSet attrs) {
         super(context, attrs);
         intArray = context.getResources().getStringArray(R.array.array_timer_minute);
         minValue = 0;
-        if(intArray.length > 0)
-            maxValue = intArray.length-1;
-        else
-            maxValue = 0;
+        maxValue = intArray.length > 0 ? intArray.length - 1 : 0;
         setPersistent(true);
-        setDialogLayoutResource(R.layout.activity_light);
+        setDialogLayoutResource(R.layout.number_picker);
     }
 
     @Override
@@ -50,11 +47,6 @@ class DialogTimerOff extends DialogPreference /*implements ActivityPreferences.I
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValue(restoreValue ? getPersistedInt(mNumber) : (Integer) defaultValue);
-    }
-
-    @Override
-    public void setDefaultValue(Object defaultValue) {
-        super.setDefaultValue(defaultValue);
     }
 
     public void setValue(int value) {

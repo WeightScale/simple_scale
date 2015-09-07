@@ -17,7 +17,7 @@
                                             android:key="@string/KEY_MAX_NULL" android:inputType="number" android:defaultValue="50"/>
                     </PreferenceCategory>
                 </PreferenceScreen>
-                <EditTextPreference android:title="@string/Timer_off" android:key="@string/KEY_TIMER" android:inputType="number"/>
+                <com.konst.simple_scale.DialogTimerOff android:title="@string/Timer_off" android:key="@string/KEY_TIMER" android:inputType="number"/>
                 <com.konst.simple_scale.DialogStepWeight android:title="@string/measuring_step" android:key="@string/KEY_STEP"
                                     android:inputType="number" />
                 <EditTextPreference android:title="@string/auto_capture" android:key="@string/KEY_AUTO_CAPTURE"

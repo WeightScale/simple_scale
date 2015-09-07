@@ -10,11 +10,11 @@ import android.view.View;
  * @author Kostya
  */
 class DialogStepWeight extends DialogPreference /*implements ActivityPreferences.InterfacePreference*/ {
-    private int mNumber = 0;
-    private String[] intArray;
+    private int mNumber;
+    private final String[] intArray;
     private NumberPicker numberPicker;
-    int minValue;
-    int maxValue;
+    final int minValue;
+    final int maxValue;
 
     public DialogStepWeight(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -25,7 +25,7 @@ class DialogStepWeight extends DialogPreference /*implements ActivityPreferences
         else
             maxValue = 0;
         setPersistent(true);
-        setDialogLayoutResource(R.layout.activity_light);
+        setDialogLayoutResource(R.layout.number_picker);
     }
 
     @Override
@@ -50,11 +50,6 @@ class DialogStepWeight extends DialogPreference /*implements ActivityPreferences
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValue(restoreValue ? getPersistedInt(mNumber) : (Integer) defaultValue);
-    }
-
-    @Override
-    public void setDefaultValue(Object defaultValue) {
-        super.setDefaultValue(defaultValue);
     }
 
     public void setValue(int value) {

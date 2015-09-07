@@ -3,25 +3,19 @@ package com.konst.simple_scale;
 
 //import android.content.SharedPreferences;
 
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.*;
 import com.konst.module.InterfaceVersions;
 import com.konst.module.ScaleModule;
 import com.konst.simple_scale.bootloader.ActivityBootloader;
 
 import java.math.BigDecimal;
-import java.security.Signer;
 import java.util.HashMap;
 import java.util.Map;
 

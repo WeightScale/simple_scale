@@ -1,12 +1,8 @@
 //Простой класс настроек
 package com.konst.simple_scale;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
-
-import java.util.Set;
 
 public class Preferences {
     private static SharedPreferences sharedPreferences;

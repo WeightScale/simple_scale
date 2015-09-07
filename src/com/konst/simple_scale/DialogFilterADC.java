@@ -3,23 +3,17 @@ package com.konst.simple_scale;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.Toast;
-import com.konst.module.ScaleModule;
 
 /**
  * @author Kostya
  */
 class DialogFilterADC extends DialogPreference /*implements ActivityPreferences.InterfacePreference*/ {
-    private int mNumber = 0;
+    private int mNumber;
     private NumberPicker numberPicker;
-    int minValue;
-    int maxValue;
+    final int minValue;
+    final int maxValue;
 
     public DialogFilterADC(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -27,7 +21,7 @@ class DialogFilterADC extends DialogPreference /*implements ActivityPreferences.
         minValue = attributesArray.getInt(R.styleable.dialogFilterADC_minFilterADC, 0);
         maxValue = attributesArray.getInt(R.styleable.dialogFilterADC_maxFilterADC, 0);
         setPersistent(true);
-        setDialogLayoutResource(R.layout.activity_light);
+        setDialogLayoutResource(R.layout.number_picker);
     }
 
     @Override
@@ -51,11 +45,6 @@ class DialogFilterADC extends DialogPreference /*implements ActivityPreferences.
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         setValue(restoreValue ? getPersistedInt(mNumber) : (Integer) defaultValue);
-    }
-
-    @Override
-    public void setDefaultValue(Object defaultValue) {
-        super.setDefaultValue(defaultValue);
     }
 
     public void setValue(int value) {

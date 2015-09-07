@@ -7,24 +7,15 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.*;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.*;
-import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.provider.Settings;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.TextAppearanceSpan;
 import android.view.*;
@@ -52,7 +43,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     private Drawable dProgressWeight, dWeightDanger;
     private SimpleGestureFilter detectorWeightView;
     private ImageView buttonFinish;
-    //private TextView textLog;
     private Vibrator vibrator; //вибратор
     private LinearLayout layoutScale;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
@@ -102,11 +92,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
             break;
             default:
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -408,9 +393,11 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
      */
     private void openSearch() {
         handlerWeight.stop(true);
-        //autoWeightThread.cancel();
+        handlerBatteryTemperature.stop(true);
+        stopThread();
         scaleModule.removeCallbacksAndMessages(null);
         scaleModule.dettach();
+
         startActivityForResult(new Intent(getBaseContext(), ActivitySearch.class), REQUEST_SEARCH_SCALE);
     }
 
@@ -459,11 +446,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         return weight / Main.stepMeasuring * Main.stepMeasuring;
     }
 
-    //==================================================================================================================
-   /* public void log(String string) { //для текста
-        textLog.setText(string + '\n' + textLog.getText());
-    }*/
-
     protected void exit() {
         stopThread();
         if (broadcastReceiver != null)
@@ -485,7 +467,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         keyguardLock.disableKeyguard();
     }
 
-    OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
+    final OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
         AlertDialog.Builder dialog;
         ProgressDialog dialogSearch;
 
@@ -625,7 +607,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
             runOnUiThread(new Runnable() {
                 Rect bounds;
                 SpannableStringBuilder w;
-                String textWeight = String.valueOf(moduleWeight);
+                final String textWeight = String.valueOf(moduleWeight);
                 @Override
                 public void run() {
 
@@ -824,14 +806,16 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     }
 
     public void stopThread(){
-        running = false;
-        boolean retry = true;
-        while(retry){
-            try {
-                threadAutoWeight.join();
-                retry = false;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        if(threadAutoWeight != null){
+            running = false;
+            boolean retry = true;
+            while(retry){
+                try {
+                    threadAutoWeight.join();
+                    retry = false;
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -857,7 +841,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 TextView tt = (TextView) view.findViewById(R.id.topText);
                 TextView bt = (TextView) view.findViewById(R.id.bottomText);
 
-                tt.setText(String.valueOf(o.getWeight())+" кг");
+                tt.setText(o.getWeight() +" кг");
                 bt.setText(o.getTime() + "   " + o.getDate());
             }
 
