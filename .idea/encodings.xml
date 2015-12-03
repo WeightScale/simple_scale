@@ -30,15 +30,10 @@
     <file url="file://$PROJECT_DIR$/res/xml/preferences.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/res/xml/tuning.xml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivityAbout.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivityPreferences.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivityScales.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivitySearch.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivityTuning.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/BluetoothListAdapter.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/CustomTextView.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/DialogFilterADC.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/DialogStepWeight.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/DialogTimerOff.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Internet.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Main.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/NumberPicker.java" charset="UTF-8" />
@@ -48,6 +43,11 @@
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/WeightTextView.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/bootloader/ActivityBootloader.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/bootloader/ActivityConnect.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/settings/ActivityPreferences.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/settings/ActivityTuning.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/settings/DialogFilterADC.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/settings/DialogStepWeight.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/settings/DialogTimerOff.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

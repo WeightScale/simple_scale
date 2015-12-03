@@ -184,7 +184,7 @@
     <string name="OK">OK</string>
     <!--<string name="search">" поиск…"</string>-->
     <string name="Error_connect">"Ошибка соединения"</string>
-    <string name="not_scale">" это не весы "</string>
+    <string name="not_scale">" неизвесная версия модуля "</string>
     <string name="Type">Тип</string>
     <string name="Enter_type">Введите Тип</string>
     <string name="TEXT_MESSAGE">Выключите весы. На весах нажмите кнопку включения и не отпускайте пока индикатор не

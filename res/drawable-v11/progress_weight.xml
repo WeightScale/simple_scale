@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-
-    <item android:id="@android:id/background" >
-        <color android:color="@color/transparent"/>
-        <!--<shape>
+    <item android:id="@android:id/background">
+        <shape>
             <corners android:radius="5dip"/>
             <gradient
                     android:startColor="#ffb7b8b7"
@@ -12,32 +10,29 @@
                     android:centerY="0.75"
                     android:endColor="#ff8e908e"
                     android:angle="270"/>
-        </shape>-->
+        </shape>
     </item>
 
     <item android:id="@android:id/secondaryProgress">
         <clip>
-            <color android:color="@color/background_light"/>
-            <!--<shape>
+            <shape>
                 <corners android:radius="5dip"/>
-
                 <gradient
                         android:startColor="#710b17ff"
                         android:centerColor="#b60b09d1"
                         android:endColor="#56080ce8"
                         android:centerY="0.75"
                         android:angle="270"/>
-                &lt;!&ndash;android:startColor="#80ffd300"
+                <!--android:startColor="#80ffd300"
                                         android:centerColor="#80ffb600"
-                                        android:endColor="#a0ffcb00"&ndash;&gt;
-            </shape>-->
+                                        android:endColor="#a0ffcb00"-->
+            </shape>
         </clip>
     </item>
 
     <item android:id="@android:id/progress">
         <clip>
-            <color android:color="@color/background_light"/>
-            <!--<shape>
+            <shape>
                 <corners android:radius="5dip"/>
                 <gradient
                         android:startColor="#ffffd300"
@@ -45,7 +40,7 @@
                         android:centerY="0.75"
                         android:endColor="#ffffcb00"
                         android:angle="270"/>
-            </shape>-->
+            </shape>
         </clip>
     </item>
 

@@ -1,10 +1,12 @@
-package com.konst.simple_scale;
+package com.konst.simple_scale.settings;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
+import com.konst.simple_scale.NumberPicker;
+import com.konst.simple_scale.R;
 
 /**
  * @author Kostya

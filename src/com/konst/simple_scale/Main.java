@@ -4,12 +4,18 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import com.konst.module.BootModule;
+import com.konst.module.Module;
 import com.konst.module.ScaleModule;
 
 /**
  * @author Kostya
  */
 public class Main extends Application {
+    private static Main singleton;
+    //private Module Module;
+    private ScaleModule scaleModule;
+    private BootModule bootModule;
     /**
      * Настройки для весов.
      */
@@ -19,7 +25,7 @@ public class Main extends Application {
      */
     public static Preferences preferencesUpdate;
 
-    static PackageInfo packageInfo;
+    PackageInfo packageInfo;
     /**
      * Версия пограммы весового модуля.
      */
@@ -28,7 +34,7 @@ public class Main extends Application {
     /**
      * Шаг измерения (округление).
      */
-    public static int stepMeasuring;
+    public int stepMeasuring;
 
     /**
      * Шаг захвата (округление).
@@ -60,37 +66,37 @@ public class Main extends Application {
     /**
      * Минимальное время бездействия весов в минутах.
      */
-    protected static final int default_min_time_off = 10;
+    public static final int default_min_time_off = 10;
 
     /**
      * Максимальное время срабатывания авто ноль секундах.
      */
-    protected static final int default_max_time_auto_null = 120;
+    public static final int default_max_time_auto_null = 120;
 
     /**
      * Предел ошибки при котором срабатывает авто ноль килограммы.
      */
-    protected static final int default_limit_auto_null = 50;
+    public static final int default_limit_auto_null = 50;
 
     /**
      * Максимальный шаг измерения весов килограммы.
      */
-    protected static final int default_max_step_scale = 20;
+    public static final int default_max_step_scale = 20;
 
     /**
      * Максимальный значение авто захвата веса килограммы.
      */
-    protected static final int default_max_auto_capture = 100;
+    public static final int default_max_auto_capture = 100;
 
     /**
      * Дельта значение авто захвата веса килограммы.
      */
-    protected static final int default_delta_auto_capture = 10;
+    public static final int default_delta_auto_capture = 10;
 
     /**
      * Минимальное значение авто захвата веса килограммы.
      */
-    protected static final int default_min_auto_capture = 20;
+    public static final int default_min_auto_capture = 20;
 
     /**
      * Максимальное количество дней для закрытия не закрытых чеков дней.
@@ -107,14 +113,57 @@ public class Main extends Application {
      */
     public static final int default_adc_filter = 15;
 
+    public PackageInfo getPackageInfo() {
+        return packageInfo;
+    }
+
+    public ScaleModule getScaleModule() {
+        return scaleModule;
+    }
+
+    public void setScaleModule(ScaleModule scaleModule) {
+        this.scaleModule = scaleModule;
+    }
+
+    public void setStepMeasuring(int stepMeasuring) {
+        this.stepMeasuring = stepMeasuring;
+    }
+
+    public int getStepMeasuring() {
+        return stepMeasuring;
+    }
+
+    public Main getInstance(){
+        return singleton;
+    }
+
+    public void setBootModule(BootModule bootModule) {
+        this.bootModule = bootModule;
+    }
+
+    public BootModule getBootModule() {
+        return bootModule;
+    }
+
+    /*public void setModule(com.konst.module.Module module) {
+        Module = module;
+    }*/
+
     @Override
     public void onCreate() {
         super.onCreate();
+        singleton = this;
         /*PreferenceManager.setDefaultValues(this, R.xml.preferences, false);*/
         try {
             PackageManager packageManager = getPackageManager();
             packageInfo = packageManager.getPackageInfo(getPackageName(), 0);
         } catch (PackageManager.NameNotFoundException e) {  }
+
+        /*try {
+            scaleModule = new ScaleModule(getPackageInfo().versionName);
+        } catch (Exception e) {
+            System.exit(1);
+        }*/
 
         preferencesScale = new Preferences(getApplicationContext(), Preferences.PREFERENCES);
         preferencesUpdate = new Preferences(getApplicationContext(), Preferences.PREF_UPDATE);
@@ -124,13 +173,10 @@ public class Main extends Application {
         autoCapture = Preferences.read(getString(R.string.KEY_AUTO_CAPTURE), default_max_auto_capture);
         day_delete = Preferences.read(getString(R.string.KEY_DAY_CHECK_DELETE), default_day_delete_check);
         day_closed = Preferences.read(getString(R.string.KEY_DAY_CLOSED_CHECK), default_day_close_check);
-        ScaleModule.setTimerNull(Preferences.read(getString(R.string.KEY_TIMER_NULL), default_max_time_auto_null));
-        ScaleModule.setWeightError(Preferences.read(getString(R.string.KEY_MAX_NULL), default_limit_auto_null));
+        //scaleModule.setTimerNull(Preferences.read(getString(R.string.KEY_TIMER_NULL), default_max_time_auto_null));
+        //scaleModule.setWeightError(Preferences.read(getString(R.string.KEY_MAX_NULL), default_limit_auto_null));
         timeDelayDetectCapture = Preferences.read(getString(R.string.KEY_TIME_DELAY_DETECT_CAPTURE), 1);
     }
 
-    @Override
-    public void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-    }
+
 }

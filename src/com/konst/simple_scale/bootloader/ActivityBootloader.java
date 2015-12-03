@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.konst.bootloader.AVRProgrammer;
 import com.konst.bootloader.HandlerBootloader;
 import com.konst.module.*;
+import com.konst.simple_scale.ActivitySearch;
 import com.konst.simple_scale.Main;
 import com.konst.simple_scale.Preferences;
 import com.konst.simple_scale.R;
@@ -38,13 +39,14 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
     private ProgressDialog progressDialog;
     private BootModule bootModule;
 
-    private AVRProgrammer programmer;
     private String addressDevice = "";
     private String hardware = "362";
+    private boolean powerOff;
     private static final String dirDeviceFiles = "device";
     private static final String dirBootFiles = "bootfiles";
 
     protected boolean flagProgramsFinish = true;
+    protected boolean flagAutoPrograming = false;
 
     static final int REQUEST_CONNECT_BOOT = 1;
     static final int REQUEST_CONNECT_SCALE = 2;
@@ -128,7 +130,8 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         setContentView(R.layout.bootloder);
 
         addressDevice = getIntent().getStringExtra(getString(R.string.KEY_ADDRESS));
-        hardware = getIntent().getStringExtra(InterfaceVersions.CMD_HARDWARE);
+        hardware = getIntent().getStringExtra(Commands.CMD_HARDWARE.getName());
+        powerOff = getIntent().getBooleanExtra("power_off", false);
 
         //Spinner spinnerField = (Spinner) findViewById(R.id.spinnerField);
         textViewLog = (TextView) findViewById(R.id.textLog);
@@ -149,7 +152,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
                 switch (i) {
                     case DialogInterface.BUTTON_POSITIVE:
                         try {
-                            bootModule.init( addressDevice);
+                            bootModule.init(addressDevice);
                             bootModule.attach();
                         } catch (Exception e) {
                             onEventConnectResult.handleConnectError(Module.ResultError.CONNECT_ERROR, e.getMessage());
@@ -166,11 +169,15 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
                 exit();
             }
         });
-        dialog.setMessage(getString(R.string.TEXT_MESSAGE));
+        if(!powerOff)
+            dialog.setMessage(getString(R.string.TEXT_MESSAGE));
+        else
+            dialog.setMessage("На весах нажмите кнопку включения и не отпускайте пока индикатор не погаснет. После этого нажмите ОК");
         dialog.show();
 
         try {
-            bootModule = new BootModule("bootloader", onEventConnectResult);
+            bootModule = new BootModule("BOOT", onEventConnectResult);
+            ((Main)getApplication()).setBootModule(bootModule);
             log(getString(R.string.bluetooth_off));
         } catch (Exception e) {
             log(e.getMessage());
@@ -210,11 +217,11 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
                     break;
                 case REQUEST_CONNECT_SCALE:
                     log(getString(R.string.Loading_settings));
-                    if (ScaleModule.isScales()) {
+                    /*if (ScaleModule.isScales()) {
                         //restorePreferences(); //todo сделать загрузку настроек которые сохранены пере перепрограммированием.
                         log(getString(R.string.Settings_loaded));
                         break;
-                    }
+                    }*/
                     log(getString(R.string.Scale_no_defined));
                     log(getString(R.string.Setting_no_loaded));
                     break;
@@ -241,16 +248,27 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
                 public void run() {
                     switch (result) {
                         case STATUS_LOAD_OK:
-                            startBoot.setEnabled(true);
-                            startBoot.setAlpha(255);
                             dialog = new AlertDialog.Builder(ActivityBootloader.this);
                             dialog.setTitle(getString(R.string.Warning_update));
                             dialog.setCancelable(false);
+                            int numVersion = bootModule.getBootVersion();
+                            if(numVersion > 1){
+                                hardware = bootModule.getModuleHardware();
+                                dialog.setMessage("После нажатия кнопки ОК начнется программирование");
+                                flagAutoPrograming = true;
+                            }else {
+                                dialog.setMessage(getString(R.string.TEXT_MESSAGE5));
+                            }
+                            startBoot.setEnabled(true);
+                            startBoot.setAlpha(255);
                             dialog.setPositiveButton(getString(R.string.OK), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     switch (i) {
                                         case DialogInterface.BUTTON_POSITIVE:
+                                            if(flagAutoPrograming){
+                                                while (bootModule.startProgramming());
+                                            }
                                             if (!startProgramed()) {
                                                 flagProgramsFinish = true;
                                             }
@@ -266,7 +284,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
                                     finish();
                                 }
                             });
-                            dialog.setMessage(getString(R.string.TEXT_MESSAGE5));
+
                             dialog.show();
                             break;
                         default:
@@ -279,8 +297,10 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         public void handleConnectError(Module.ResultError error, String s) {
             switch (error) {
                 case CONNECT_ERROR:
-                    Intent intent = new Intent(getBaseContext(), ActivityConnect.class);
+                    //Intent intent = new Intent(getBaseContext(), ActivityConnect.class);
+                    Intent intent = new Intent(getBaseContext(), ActivitySearch.class);
                     intent.putExtra("address", addressDevice);
+                    intent.setAction("bootloader");
                     startActivityForResult(intent, REQUEST_CONNECT_BOOT);
                     break;
                 default:
@@ -331,23 +351,25 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         }
     }
 
-    static boolean isBootloader() { //Является ли весами и какой версии
-        String vrs = Module.getModuleVersion(); //Получаем версию загрузчика
+    boolean isBootloader() { //Является ли весами и какой версии
+        String vrs = bootModule.getModuleVersion(); //Получаем версию загрузчика
         return vrs.startsWith("BOOT");
     }
 
-    boolean startProgramed() {
-        programmer = new AVRProgrammer(handlerProgrammed) {
-            @Override
-            public void sendByte(byte b) {
-                Module.sendByte(b);
-            }
+    final private AVRProgrammer programmer = new AVRProgrammer(handlerProgrammed) {
+        @Override
+        public void sendByte(byte b) {
+            bootModule.sendByte(b);
+        }
 
-            @Override
-            public int getByte() {
-                return Module.getByte();
-            }
-        };
+        @Override
+        public int getByte() {
+            return bootModule.getByte();
+        }
+    };
+
+    boolean startProgramed() {
+
         if (!programmer.isProgrammerId()) {
             log(getString(R.string.Not_programmer));
             return false;

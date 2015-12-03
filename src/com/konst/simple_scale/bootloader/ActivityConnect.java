@@ -24,6 +24,7 @@ import com.konst.module.BootModule;
 import com.konst.module.Module;
 import com.konst.module.OnEventConnectResult;
 import com.konst.simple_scale.Internet;
+import com.konst.simple_scale.Main;
 import com.konst.simple_scale.R;
 
 public class ActivityConnect extends Activity implements View.OnClickListener {
@@ -48,16 +49,20 @@ public class ActivityConnect extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.connect);
         textViewLog = (TextView) findViewById(R.id.textLog);
-        try {
+        bootModule = ((Main)getApplication()).getBootModule();
+        log(R.string.bluetooth_off, true);
+        setupScale();
+        /*try {
             bootModule = new BootModule("bootloader", onEventConnectResult);
             log(R.string.bluetooth_off, true);
             setupScale();
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
-        }
+        }*/
     }
 
     //==================================================================================================================
@@ -122,7 +127,7 @@ public class ActivityConnect extends Activity implements View.OnClickListener {
     void setupScale() {
         /*Window window = getWindow();
         window.requestFeature(Window.FEATURE_CUSTOM_TITLE);*/
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
 
 
 
