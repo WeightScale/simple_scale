@@ -23,7 +23,7 @@ public class Main extends Application {
     /**
      * Настройки для обновления весов.
      */
-    public static Preferences preferencesUpdate;
+    //public static Preferences preferencesUpdate;
 
     PackageInfo packageInfo;
     /**
@@ -36,10 +36,8 @@ public class Main extends Application {
      */
     public int stepMeasuring;
 
-    /**
-     * Шаг захвата (округление).
-     */
-    public static int autoCapture;
+    /** Шаг захвата (округление). */
+    public int autoCapture;
 
     /**
      * Время задержки для авто захвата после которого начинается захват в секундах.
@@ -145,6 +143,14 @@ public class Main extends Application {
         return bootModule;
     }
 
+    public int getAutoCapture() {
+        return autoCapture;
+    }
+
+    public void setAutoCapture(int autoCapture) {
+        this.autoCapture = autoCapture;
+    }
+
     /*public void setModule(com.konst.module.Module module) {
         Module = module;
     }*/
@@ -165,8 +171,8 @@ public class Main extends Application {
             System.exit(1);
         }*/
 
-        preferencesScale = new Preferences(getApplicationContext(), Preferences.PREFERENCES);
-        preferencesUpdate = new Preferences(getApplicationContext(), Preferences.PREF_UPDATE);
+        preferencesScale = new Preferences(getApplicationContext());
+        //preferencesUpdate = new Preferences(getApplicationContext(), Preferences.PREF_UPDATE);
         Preferences.load(getSharedPreferences(Preferences.PREFERENCES, Context.MODE_PRIVATE)); //загрузить настройки
 
         stepMeasuring = Preferences.read(getString(R.string.KEY_STEP), default_max_step_scale);

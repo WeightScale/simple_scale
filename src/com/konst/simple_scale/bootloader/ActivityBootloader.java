@@ -155,7 +155,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
                             bootModule.init(addressDevice);
                             bootModule.attach();
                         } catch (Exception e) {
-                            onEventConnectResult.handleConnectError(Module.ResultError.CONNECT_ERROR, e.getMessage());
+                            connectResultCallback.connectError(Module.ResultError.CONNECT_ERROR, e.getMessage());
                         }
                         break;
                     default:
@@ -176,7 +176,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         dialog.show();
 
         try {
-            bootModule = new BootModule("BOOT", onEventConnectResult);
+            bootModule = new BootModule("BOOT", connectResultCallback);
             ((Main)getApplication()).setBootModule(bootModule);
             log(getString(R.string.bluetooth_off));
         } catch (Exception e) {
@@ -213,7 +213,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
             switch (requestCode) {
                 case REQUEST_CONNECT_BOOT:
                     //scaleModule.obtainMessage(HandlerScaleConnect.Result.STATUS_LOAD_OK.ordinal()).sendToTarget();
-                    onEventConnectResult.handleResultConnect(Module.ResultConnect.STATUS_LOAD_OK);
+                    connectResultCallback.resultConnect(Module.ResultConnect.STATUS_LOAD_OK);
                     break;
                 case REQUEST_CONNECT_SCALE:
                     log(getString(R.string.Loading_settings));
@@ -238,11 +238,11 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         super.onDestroy();
     }*/
 
-    final OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
+    final ConnectResultCallback connectResultCallback = new ConnectResultCallback() {
         private AlertDialog.Builder dialog;
 
         @Override
-        public void handleResultConnect(final Module.ResultConnect result) {
+        public void resultConnect(final Module.ResultConnect result) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -294,7 +294,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         }
 
         @Override
-        public void handleConnectError(Module.ResultError error, String s) {
+        public void connectError(Module.ResultError error, String s) {
             switch (error) {
                 case CONNECT_ERROR:
                     //Intent intent = new Intent(getBaseContext(), ActivityConnect.class);

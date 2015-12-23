@@ -31,7 +31,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class ActivityScales extends Activity implements View.OnClickListener, Runnable{
-    Main main;
+    private Main main;
     private SpannableStringBuilder textKg;
     private SpannableStringBuilder textBattery;
     private TextView textViewBattery;
@@ -48,13 +48,13 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     private LinearLayout layoutScale;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
     //final AutoWeight autoWeight = new AutoWeight();
-    ScaleModule scaleModule;
+    private ScaleModule scaleModule;
 
     public int numStable;
-    int moduleWeight;
+    private int moduleWeight;
     //int moduleSensorValue;
     protected int tempWeight;
-    Thread threadAutoWeight;
+    private Thread threadAutoWeight;
     boolean running;
     /**
      * Количество стабильных показаний веса для авто сохранения
@@ -132,7 +132,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         textViewBattery = (TextView)findViewById(R.id.textBattery);
 
         listView = (ListView)findViewById(R.id.listView);
-        listView.setCacheColorHint(R.color.transparent);
+        listView.setCacheColorHint(getResources().getColor(R.color.transparent));
         listView.setVerticalFadingEdgeEnabled(false);
 
         findViewById(R.id.imageMenu).setOnClickListener(this);
@@ -202,7 +202,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         //Toast.makeText(getBaseContext(), R.string.bluetooth_off, Toast.LENGTH_SHORT).show();
         //connectScaleModule(Preferences.read(getString(R.string.KEY_LAST_SCALES), ""));
         try {
-            scaleModule = new ScaleModule(main.getPackageInfo().versionName, onEventConnectResult);
+            scaleModule = new ScaleModule(main.getPackageInfo().versionName, connectResultCallback);
             main.setScaleModule(scaleModule);
             scaleModule.setTimerNull(Preferences.read(getString(R.string.KEY_TIMER_NULL), main.default_max_time_auto_null));
             scaleModule.setWeightError(Preferences.read(getString(R.string.KEY_MAX_NULL), main.default_limit_auto_null));
@@ -299,7 +299,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         setProgressBarIndeterminateVisibility(false);
         switch (resultCode) {
             case RESULT_OK:
-                onEventConnectResult.handleResultConnect(Module.ResultConnect.STATUS_LOAD_OK);
+                connectResultCallback.resultConnect(Module.ResultConnect.STATUS_LOAD_OK);
                 break;
             case RESULT_CANCELED:
                 //scaleModule.obtainMessage(RESULT_CANCELED, "Connect error").sendToTarget();
@@ -421,7 +421,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
      */
     public boolean isCapture() {
         boolean capture = false;
-        while (getWeightToStepMeasuring(moduleWeight) > Main.autoCapture) {
+        while (getWeightToStepMeasuring(moduleWeight) > main.getAutoCapture()) {
             if (capture) {
                 return true;
             } else {
@@ -465,7 +465,9 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         scaleModule.dettach();
         scaleModule.getAdapter().disable();
         while (scaleModule.getAdapter().isEnabled()) ;
-        //scaleModule = null;
+        int pid = android.os.Process.myPid();
+        android.os.Process.killProcess(pid);
+        System.exit(0);
     }
 
     private void wakeUp(){
@@ -480,7 +482,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         keyguardLock.disableKeyguard();
     }
 
-    final OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
+    final ConnectResultCallback connectResultCallback = new ConnectResultCallback() {
         AlertDialog.Builder dialog;
         ProgressDialog dialogSearch;
 
@@ -488,14 +490,14 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
          * @param resultConnect Результат соединения энкмератор ResultConnect.
          */
         @Override
-        public void handleResultConnect(Module.ResultConnect resultConnect) {
+        public void resultConnect(Module.ResultConnect resultConnect) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     switch (resultConnect) {
                         case STATUS_LOAD_OK:
-                            scaleModule.setOnEventResultWeight(onEventResultWeight);
-                            scaleModule.setOnEventResultBatteryTemperature(onEventResultBatteryTemperature);
+                            scaleModule.setWeightCallback(weightCallback);
+                            scaleModule.setBatteryTemperatureCallback(batteryTemperatureCallback);
                             try {
                                 setTitle(getString(R.string.app_name) + " \"" + scaleModule.getNameBluetoothDevice() + "\", v." + scaleModule.getNumVersion()); //установить заголовок
                             } catch (Exception e) {
@@ -537,7 +539,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
          * @param s Описание ошибки.
          */
         @Override
-        public void handleConnectError(final Module.ResultError error, final String s) {
+        public void connectError(final Module.ResultError error, final String s) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -606,7 +608,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
      * Обработчик показаний веса.
      * Возвращяем время обновления показаний веса в милисекундах.
      */
-    ScaleModule.OnEventResultWeight onEventResultWeight = new ScaleModule.OnEventResultWeight() {
+    ScaleModule.WeightCallback weightCallback = new ScaleModule.WeightCallback() {
         /** Сообщение показаний веса.
          * @param what Результат статуса сообщения энумератор ResultWeight.
          * @param weight Данные веса в килограмах.
@@ -674,7 +676,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     /** Обработчик показаний заряда батареи и температуры.
      * Возвращяет время обновления в секундах.
      */
-    ScaleModule.OnEventResultBatteryTemperature onEventResultBatteryTemperature = new ScaleModule.OnEventResultBatteryTemperature() {
+    ScaleModule.BatteryTemperatureCallback batteryTemperatureCallback = new ScaleModule.BatteryTemperatureCallback() {
         /** Сообщение
          * @param battery Заряд батареи в процентах.
          * @param temperature Температура в градусах.
@@ -696,7 +698,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
 
                 }
             });
-            return 5; //Обновляется через секунд
+            return 5000; //Обновляется через милисекунд.
         }
     };
 

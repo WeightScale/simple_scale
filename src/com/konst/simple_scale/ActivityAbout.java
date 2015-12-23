@@ -1,7 +1,11 @@
 package com.konst.simple_scale;
 
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.StyleSpan;
 import android.view.WindowManager;
 import android.widget.TextView;
 import com.konst.module.ScaleModule;
@@ -10,8 +14,89 @@ import com.konst.module.ScaleModule;
  * Created by Kostya on 26.04.14.
  */
 public class ActivityAbout extends Activity {
-    Main main;
-    ScaleModule scaleModule;
+    private static Main main;
+    private  static ScaleModule scaleModule;
+    enum StrokeSettings{
+        VERSION(R.string.Version_scale){
+            @Override
+            String getValue() {
+                return String.valueOf(scaleModule.getNumVersion()); }
+
+            @Override
+            int getMeasure() { return -1; }
+        },
+        NAME_BLUETOOTH(R.string.Name_module_bluetooth) {
+            @Override
+            String getValue() {return scaleModule.getNameBluetoothDevice().toString(); }
+
+            @Override
+            int getMeasure() { return -1;}
+        },
+        ADDRESS_BLUETOOTH(R.string.Address_bluetooth) {
+            @Override
+            String getValue() { return scaleModule.getAddressBluetoothDevice() + '\n'; }
+
+            @Override
+            int getMeasure() { return -1; }
+        },
+        BATTERY(R.string.Battery) {
+            @Override
+            String getValue() { return scaleModule.getBattery() + " %"; }
+
+            @Override
+            int getMeasure() { return -1; }
+        },
+        TEMPERATURE(R.string.Temperature) {
+            @Override
+            String getValue() {
+                return scaleModule.isAttach()?scaleModule.getModuleTemperature() + "°" + 'C' :"error"+ '\n';
+            }
+
+            @Override
+            int getMeasure() { return -1; }
+        },
+        COEFFICIENT_A(R.string.Coefficient) {
+            @Override
+            String getValue() {  return String.valueOf(scaleModule.getCoefficientA()); }
+
+            @Override
+            int getMeasure() { return -1; }
+        },
+        WEIGHT_MAX(R.string.MLW) {
+            final int resIdKg = R.string.scales_kg;
+            @Override
+            String getValue() {  return scaleModule.getWeightMax() + " "; }
+
+            @Override
+            int getMeasure() { return resIdKg; }
+        },
+        TIME_OFF(R.string.Off_timer) {
+            final int reIdMinute = R.string.minute;
+            @Override
+            String getValue() { return scaleModule.getTimeOff() + " "; }
+
+            @Override
+            int getMeasure() { return reIdMinute; }
+        },
+        STEP(R.string.Step_capacity_scale){
+            final int resIdKg = R.string.scales_kg;
+            @Override
+            String getValue() { return main.getStepMeasuring() + " "; }
+
+            @Override
+            int getMeasure() {  return resIdKg; }
+        };
+
+        private final int resId;
+        abstract String getValue();
+        abstract int getMeasure();
+
+        StrokeSettings(int res){
+            resId = res;
+        }
+
+        public int getResId() {return resId;}
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,37 +115,27 @@ public class ActivityAbout extends Activity {
         textSoftVersion.setText(main.getPackageInfo().versionName + ' ' + String.valueOf(main.getPackageInfo().versionCode));
 
         TextView textSettings = (TextView) findViewById(R.id.textSettings);
-        textSettings.append(getString(R.string.Version_scale) + scaleModule.getNumVersion() + '\n');
-        try {
-            textSettings.append(getString(R.string.Name_module_bluetooth) + scaleModule.getNameBluetoothDevice() + '\n');
-        } catch (Exception e) {
-            textSettings.append(getString(R.string.Name_module_bluetooth) + '\n');
-        }
-        try {
-            textSettings.append(getString(R.string.Address_bluetooth) + scaleModule.getAddressBluetoothDevice() + '\n');
-        } catch (Exception e) {
-            textSettings.append(getString(R.string.Address_bluetooth) + '\n');
-        }
-
-        textSettings.append("\n");
-        textSettings.append(getString(R.string.Battery) + scaleModule.getBattery() + " %" + '\n');
-        if (scaleModule.isAttach()) {
-            textSettings.append(getString(R.string.Temperature) + scaleModule.getModuleTemperature() + '°' + 'C' + '\n');
-        }
-        textSettings.append(getString(R.string.Coefficient) + scaleModule.getCoefficientA() + '\n');
-        textSettings.append(getString(R.string.MLW) + scaleModule.getWeightMax() + ' ' + getString(R.string.scales_kg) + '\n');
-        textSettings.append("\n");
-        //textSettings.append(getString(R.string.Table_google_disk) + ScaleModule.getSpreadSheet() + '\n');
-        //textSettings.append(getString(R.string.User_google_disk) + ScaleModule.getUserName() + '\n');
-        //textSettings.append(getString(R.string.Phone_for_sms) + ScaleModule.getPhone() + '\n');
-        textSettings.append("\n");
-        textSettings.append(getString(R.string.Off_timer) + scaleModule.getTimeOff() + ' ' + getString(R.string.minute) + '\n');
-        textSettings.append(getString(R.string.Step_capacity_scale) + ((Main)getApplication()).getStepMeasuring() + ' ' + getString(R.string.scales_kg) + '\n');
-        textSettings.append(getString(R.string.Capture_weight) + Main.autoCapture + ' ' + getString(R.string.scales_kg) + '\n');
+        parserTextSettings(textSettings);
         textSettings.append("\n");
 
         TextView textAuthority = (TextView) findViewById(R.id.textAuthority);
         textAuthority.append(getString(R.string.Copyright) + '\n');
         textAuthority.append(getString(R.string.Reserved) + '\n');
+    }
+
+    void parserTextSettings(TextView textView){
+        for (StrokeSettings s : StrokeSettings.values()){
+            try {
+                SpannableStringBuilder text = new SpannableStringBuilder(getString(s.getResId()));
+                text.setSpan(new StyleSpan(Typeface.NORMAL), 0, text.length(), Spanned.SPAN_MARK_MARK);
+                textView.append(text);
+                SpannableStringBuilder value = new SpannableStringBuilder(s.getValue());
+                value.setSpan(new StyleSpan(Typeface.BOLD_ITALIC),0,value.length(), Spanned.SPAN_MARK_MARK);
+                textView.append(value);
+                textView.append((s.getMeasure() == -1 ? "" : getString(s.getMeasure())) + '\n');
+            }catch (Exception e){
+                textView.append("\n");
+            }
+        }
     }
 }

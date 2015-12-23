@@ -3,6 +3,7 @@ package com.konst.simple_scale;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 public class Preferences {
     private static SharedPreferences sharedPreferences;
@@ -16,6 +17,12 @@ public class Preferences {
 
     Preferences(Context context, String name) {
         load(context.getSharedPreferences(name, Context.MODE_PRIVATE)); //загрузить настройки
+    }
+
+    public Preferences(Context context) {
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        editor = sharedPreferences.edit();
+        editor.apply();
     }
 
     public static void load(SharedPreferences sp) {

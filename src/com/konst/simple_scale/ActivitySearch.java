@@ -10,8 +10,8 @@ import android.content.*;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import com.konst.module.ConnectResultCallback;
 import com.konst.module.Module;
-import com.konst.module.OnEventConnectResult;
 import com.konst.simple_scale.settings.ActivityPreferences;
 import com.konst.simple_scale.settings.ActivityTuning;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class ActivitySearch extends Activity implements View.OnClickListener {
 
-    Module module;
+    private Module module;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
     private ArrayList<BluetoothDevice> foundDevice; //чужие устройства
     private ArrayAdapter<BluetoothDevice> bluetoothAdapter; //адаптер имён
@@ -72,7 +72,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         }else {
             module = ((Main)getApplication()).getScaleModule();
         }
-        module.setOnEventConnectResult(onEventConnectResult);
+        module.setConnectResultCallback(connectResultCallback);
 
         broadcastReceiver = new BroadcastReceiver() {
 
@@ -254,12 +254,12 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         textViewLog.setText(getString(resource) + ' ' + str + '\n' + textViewLog.getText());
     }
 
-    final OnEventConnectResult onEventConnectResult = new OnEventConnectResult() {
+    final ConnectResultCallback connectResultCallback = new ConnectResultCallback() {
         AlertDialog.Builder dialog;
         private ProgressDialog dialogSearch;
 
         @Override
-        public void handleResultConnect(final Module.ResultConnect result) {
+        public void resultConnect(final Module.ResultConnect result) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -298,7 +298,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         }
 
         @Override
-        public void handleConnectError(final Module.ResultError error, final String s) {
+        public void connectError(final Module.ResultError error, final String s) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
