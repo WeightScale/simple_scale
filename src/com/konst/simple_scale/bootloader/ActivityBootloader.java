@@ -37,6 +37,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
     private ImageView startBoot, buttonBack;
     private TextView textViewLog;
     private ProgressDialog progressDialog;
+    private Main main;
     private BootModule bootModule;
 
     private String addressDevice = "";
@@ -129,6 +130,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.bootloder);
 
+        main = (Main)getApplication();
         addressDevice = getIntent().getStringExtra(getString(R.string.KEY_ADDRESS));
         hardware = getIntent().getStringExtra(Commands.CMD_HARDWARE.getName());
         powerOff = getIntent().getBooleanExtra("power_off", false);
@@ -343,7 +345,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
     void exit() {
         if (flagProgramsFinish) {
             //Preferences.load(getSharedPreferences(Preferences.PREFERENCES, Context.MODE_PRIVATE));
-            Preferences.write(getString(R.string.KEY_FLAG_UPDATE), true);
+            main.getPreferencesScale().write(getString(R.string.KEY_FLAG_UPDATE), true);
             bootModule.dettach();
             BluetoothAdapter.getDefaultAdapter().disable();
             while (BluetoothAdapter.getDefaultAdapter().isEnabled()) ;

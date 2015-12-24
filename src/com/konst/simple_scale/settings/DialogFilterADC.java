@@ -1,6 +1,7 @@
 package com.konst.simple_scale.settings;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
@@ -66,5 +67,8 @@ class DialogFilterADC extends DialogPreference /*implements ActivityPreferences.
         return a.getInt(index, 0);
     }
 
-
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        setValue((int) defaultValue);
+    }
 }

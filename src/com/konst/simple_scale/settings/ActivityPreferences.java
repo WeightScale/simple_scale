@@ -29,39 +29,6 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
     private static ScaleModule scaleModule;
     private boolean flagChange;
     enum EnumPreference{
-        NAME(R.string.KEY_NAME){
-            @Override
-            void setup(Preference name) throws Exception {
-                Context context = name.getContext();
-                try {
-                    name.setSummary(scaleModule.getNameBluetoothDevice());
-                    name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object o) {
-                            if (o.toString().isEmpty()) {
-                                Toast.makeText(context, R.string.preferences_no, Toast.LENGTH_SHORT).show();
-                                return false;
-                            }
-                            if (scaleModule.setModuleName(o.toString())) {
-                                preference.setSummary(o.toString());
-                                Toast.makeText(context, context.getString(R.string.preferences_yes) + ' ' + o.toString(), Toast.LENGTH_SHORT).show();
-                                return true;
-                            }
-                            Toast.makeText(context, R.string.preferences_no, Toast.LENGTH_SHORT).show();
-                            return false;
-                        }
-                    });
-                } catch (Exception e) {
-                    name.setEnabled(false);
-                }
-            }
-        },
-        ADDRESS(R.string.KEY_ADDRESS){
-            @Override
-            void setup(Preference name) throws Exception {
-                name.setSummary(scaleModule.getAddressBluetoothDevice());
-            }
-        },
         NULL(R.string.KEY_NULL){
             @Override
             void setup(Preference name)throws Exception {
@@ -87,7 +54,9 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
             @Override
             void setup(Preference name)throws Exception {
                 Context context = name.getContext();
-                name.setTitle(context.getString(R.string.filter_adc) + ' ' + String.valueOf(scaleModule.getFilterADC()));
+                int f = scaleModule.getFilterADC();
+                name.setDefaultValue(new Integer(f));
+                name.setTitle(context.getString(R.string.filter_adc) + ' ' + String.valueOf(f));
                 name.setSummary(context.getString(R.string.sum_filter_adc) + ' ' + context.getString(R.string.The_range_is_from_0_to) + context.getResources().getInteger(R.integer.default_adc_filter));
                 name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
@@ -115,7 +84,9 @@ public class ActivityPreferences extends PreferenceActivity implements SharedPre
             @Override
             void setup(Preference name)throws Exception {
                 Context context = name.getContext();
-                name.setTitle(context.getString(R.string.Timer_off) + ' ' + scaleModule.getTimeOff() + ' ' + context.getString(R.string.minute));
+                int t = scaleModule.getTimeOff();
+                name.setDefaultValue(new Integer(t));
+                name.setTitle(context.getString(R.string.Timer_off) + ' ' + t + ' ' + context.getString(R.string.minute));
                 name.setSummary(context.getString(R.string.sum_timer) + ' ' + context.getString(R.string.range) + context.getResources().getInteger(R.integer.default_min_time_off) + context.getString(R.string.to) + context.getResources().getInteger(R.integer.default_max_time_off));
                 name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override

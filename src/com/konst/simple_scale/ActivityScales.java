@@ -106,7 +106,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     @Override
     protected void onPause() {
         super.onPause();
-        scaleModule.stopMeasuringBatteryTemperature(true);
+        scaleModule.stopMeasuringBatteryTemperature(false);
         scaleModule.stopMeasuringWeight(true);
     }
 
@@ -204,10 +204,10 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         try {
             scaleModule = new ScaleModule(main.getPackageInfo().versionName, connectResultCallback);
             main.setScaleModule(scaleModule);
-            scaleModule.setTimerNull(Preferences.read(getString(R.string.KEY_TIMER_NULL), main.default_max_time_auto_null));
-            scaleModule.setWeightError(Preferences.read(getString(R.string.KEY_MAX_NULL), main.default_limit_auto_null));
+            scaleModule.setTimerNull(main.getPreferencesScale().read(getString(R.string.KEY_TIMER_NULL), getResources().getInteger(R.integer.default_max_time_auto_null)));
+            scaleModule.setWeightError(main.getPreferencesScale().read(getString(R.string.KEY_MAX_NULL), getResources().getInteger(R.integer.default_limit_auto_null)));
             Toast.makeText(getBaseContext(), R.string.bluetooth_off, Toast.LENGTH_SHORT).show();
-            connectScaleModule(Preferences.read(getString(R.string.KEY_LAST_SCALES), ""));
+            connectScaleModule(main.getPreferencesScale().read(getString(R.string.KEY_LAST_SCALES), ""));
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
@@ -503,7 +503,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                             } catch (Exception e) {
                                 setTitle(getString(R.string.app_name) + " , v." + scaleModule.getNumVersion()); //установить заголовок
                             }
-                            Preferences.write(getString(R.string.KEY_LAST_SCALES), scaleModule.getAddressBluetoothDevice());
+                            main.getPreferencesScale().write(getString(R.string.KEY_LAST_SCALES), scaleModule.getAddressBluetoothDevice());
                             setupListView();
                             setupWeightView();
                             scaleModule.startMeasuringWeight();

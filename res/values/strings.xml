@@ -38,7 +38,7 @@
     <string name="Number_phone">"Номер телефона: "</string>
     <string name="Battery">"Батарея: "</string>
     <string name="Temperature">"Температура: "</string>
-    <string name="Coefficient">"Коэфициэнт: "</string>
+    <string name="Coefficient">"Коэффициэнт: "</string>
     <string name="MLW">"НПВ: "</string>
     <string name="Off_timer">"Таймер выключения: "</string>
     <string name="Step_capacity_scale">"Шаг измерения веса: "</string>

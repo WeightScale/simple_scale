@@ -5,8 +5,11 @@ import android.content.res.TypedArray;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
+import com.konst.simple_scale.Main;
 import com.konst.simple_scale.NumberPicker;
 import com.konst.simple_scale.R;
+
+import java.util.Arrays;
 
 /**
  * @author Kostya
@@ -26,6 +29,10 @@ class DialogStepWeight extends DialogPreference /*implements ActivityPreferences
             maxValue = intArray.length-1;
         else
             maxValue = 0;
+        int step = getPersistedInt(context.getResources().getInteger(R.integer.default_step_scale));
+        int index = Arrays.asList(intArray).indexOf(String.valueOf(step));
+        if(index != -1)
+            mNumber = index;
         setPersistent(true);
         setDialogLayoutResource(R.layout.number_picker);
     }
@@ -51,12 +58,14 @@ class DialogStepWeight extends DialogPreference /*implements ActivityPreferences
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        setValue(restoreValue ? getPersistedInt(mNumber) : (Integer) defaultValue);
+        int value = restoreValue? getPersistedInt(mNumber) : (Integer) defaultValue;
+        setValue(Arrays.asList(intArray).indexOf(String.valueOf(value)));
     }
 
     public void setValue(int value) {
         if (shouldPersist()) {
-            persistInt(value);
+            persistInt(Integer.valueOf(intArray[value]));
+            //persistInt(value);
         }
 
         if (value != mNumber) {
@@ -71,5 +80,8 @@ class DialogStepWeight extends DialogPreference /*implements ActivityPreferences
         return a.getInt(index, 0);
     }
 
-
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        super.setDefaultValue(defaultValue);
+    }
 }

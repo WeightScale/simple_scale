@@ -18,7 +18,7 @@ import com.konst.simple_scale.settings.ActivityTuning;
 import java.util.ArrayList;
 
 public class ActivitySearch extends Activity implements View.OnClickListener {
-
+    private Main main;
     private Module module;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
     private ArrayList<BluetoothDevice> foundDevice; //чужие устройства
@@ -62,15 +62,14 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         lp.screenBrightness = 1.0f;
         getWindow().setAttributes(lp);
 
-        //Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        main = (Main)getApplication();
         textViewLog = (TextView) findViewById(R.id.textLog);
-        //bluetooth = BluetoothAdapter.getDefaultAdapter();
 
         String action = getIntent().getAction();
         if("bootloader".equals(action)){
-            module = ((Main)getApplication()).getBootModule();
+            module = main.getBootModule();
         }else {
-            module = ((Main)getApplication()).getScaleModule();
+            module = main.getScaleModule();
         }
         module.setConnectResultCallback(connectResultCallback);
 
@@ -132,8 +131,8 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
 
         foundDevice = new ArrayList<>();
 
-        for (int i = 0; Preferences.contains(getString(R.string.KEY_ADDRESS) + i); i++) { //заполнение списка
-            foundDevice.add(module.getAdapter().getRemoteDevice(Preferences.read(getString(R.string.KEY_ADDRESS) + i, "")));
+        for (int i = 0; main.getPreferencesScale().contains(getString(R.string.KEY_ADDRESS) + i); i++) { //заполнение списка
+            foundDevice.add(module.getAdapter().getRemoteDevice(main.getPreferencesScale().read(getString(R.string.KEY_ADDRESS) + i, "")));
         }
         bluetoothAdapter = new BluetoothListAdapter(this, foundDevice);
 
@@ -164,11 +163,11 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         }
         unregisterReceiver(broadcastReceiver);
 
-        for (int i = 0; Preferences.contains(getString(R.string.KEY_ADDRESS) + i); i++) { //стереть прошлый список
-            Preferences.remove(getString(R.string.KEY_ADDRESS) + i);
+        for (int i = 0; main.getPreferencesScale().contains(getString(R.string.KEY_ADDRESS) + i); i++) { //стереть прошлый список
+            main.getPreferencesScale().remove(getString(R.string.KEY_ADDRESS) + i);
         }
         for (int i = 0; i < foundDevice.size(); i++) { //сохранить новый список
-            Preferences.write(getString(R.string.KEY_ADDRESS) + i, ((BluetoothDevice) foundDevice.toArray()[i]).getAddress());
+            main.getPreferencesScale().write(getString(R.string.KEY_ADDRESS) + i, ((BluetoothDevice) foundDevice.toArray()[i]).getAddress());
         }
 
     }

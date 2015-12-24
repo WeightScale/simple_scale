@@ -8,6 +8,8 @@ import android.view.View;
 import com.konst.simple_scale.NumberPicker;
 import com.konst.simple_scale.R;
 
+import java.util.Arrays;
+
 /**
  * @author Kostya
  */
@@ -68,5 +70,9 @@ class DialogTimerOff extends DialogPreference /*implements ActivityPreferences.I
         return a.getInt(index, 0);
     }
 
-
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        setValue(Arrays.asList(intArray).indexOf(String.valueOf(defaultValue)));
+        //setValue((int)defaultValue);
+    }
 }

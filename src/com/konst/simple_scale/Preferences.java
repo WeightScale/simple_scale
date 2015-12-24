@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 public class Preferences {
-    private static SharedPreferences sharedPreferences;
-    private static SharedPreferences.Editor editor;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     public static final String PREFERENCES = "preferences"; //настройки общии для весов
     public static final String PREF_UPDATE = "pref_update";    //настройки сохраненные при обновлении прошивки
@@ -25,51 +25,51 @@ public class Preferences {
         editor.apply();
     }
 
-    public static void load(SharedPreferences sp) {
+    public void load(SharedPreferences sp) {
         sharedPreferences = sp;
         editor = sp.edit();
         editor.apply();
     }
 
-    public static void write(String key, String value) {
+    public void write(String key, String value) {
         editor.putString(key, value);
         editor.commit();
     }
 
-    public static void write(String key, int value) {
+    public void write(String key, int value) {
         editor.putInt(key, value);
         editor.commit();
     }
 
-    public static void write(String key, float value) {
+    public void write(String key, float value) {
         editor.putFloat(key, value);
         editor.commit();
     }
 
-    public static void write(String key, boolean value) {
+    public void write(String key, boolean value) {
         editor.putBoolean(key, value);
         editor.commit();
     }
 
-    public static String read(String key, String def) {
+    public String read(String key, String def) {
         return sharedPreferences.getString(key, def);
     }
 
-    static boolean read(String key, boolean def) {
+    boolean read(String key, boolean def) {
         return sharedPreferences.getBoolean(key, def);
     }
 
-    public static int read(String key, int in) {
+    public int read(String key, int in) {
         return sharedPreferences.getInt(key, in);
     }
 
-    public static float read(String key, float in) { return sharedPreferences.getFloat(key, in); }
+    public float read(String key, float in) { return sharedPreferences.getFloat(key, in); }
 
-    static boolean contains(String key) {
+    boolean contains(String key) {
         return sharedPreferences.contains(key);
     }
 
-    static void remove(String key) {
+    void remove(String key) {
         editor.remove(key);
         editor.commit();
     }
