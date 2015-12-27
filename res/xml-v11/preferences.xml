@@ -27,7 +27,7 @@
                 android:summary="@string/sum_filter_adc"
                 android:key="@string/KEY_FILTER"/>
         <Preference android:title="Для администратора" android:summary="Настройки для опытного пользователя (калибровка ...)" android:key="@string/KEY_ADMIN"/>
-        <Preference android:title="@string/zeroing" android:key="@string/KEY_NULL" android:numeric="integer" android:inputType="number"/>
+        <Preference android:title="@string/zeroing" android:key="@string/KEY_NULL" android:inputType="number"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="Программа">
         <Preference android:title="@string/about" android:key="@string/KEY_ABOUT"/>

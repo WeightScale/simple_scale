@@ -133,7 +133,7 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
         main = (Main)getApplication();
         addressDevice = getIntent().getStringExtra(getString(R.string.KEY_ADDRESS));
         hardware = getIntent().getStringExtra(Commands.CMD_HARDWARE.getName());
-        powerOff = getIntent().getBooleanExtra("power_off", false);
+        powerOff = getIntent().getBooleanExtra("com.konst.simple_scale.POWER", false);
 
         //Spinner spinnerField = (Spinner) findViewById(R.id.spinnerField);
         textViewLog = (TextView) findViewById(R.id.textLog);
@@ -349,7 +349,8 @@ public class ActivityBootloader extends Activity implements View.OnClickListener
             bootModule.dettach();
             BluetoothAdapter.getDefaultAdapter().disable();
             while (BluetoothAdapter.getDefaultAdapter().isEnabled()) ;
-            finish();
+            System.exit(0);
+            //finish();
         }
     }
 

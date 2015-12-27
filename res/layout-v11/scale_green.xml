@@ -37,7 +37,7 @@
                             android:id="@+id/weightTextView"
                             android:textColor="@color/white"
                             android:textSize="@dimen/text_big"
-                            android:gravity="center" android:clickable="true" android:text="123"
+                            android:gravity="center" android:clickable="true"
                             android:textAppearance="?android:attr/textAppearanceMedium"/>
                 </LinearLayout>
             </FrameLayout>

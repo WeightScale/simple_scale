@@ -6,7 +6,7 @@
             <PreferenceCategory android:title="Калибровка весов">
                 <Preference android:title="Нулевой вес"
                             android:summary="Установите нулевой вес на весах, и нажминте на поле" android:key="@string/KEY_POINT1"/>
-                <EditTextPreference android:title="Контрольный вес"
+                <com.konst.simple_scale.settings.DialogPoint2 android:title="Контрольный вес"
                                     android:summary=" Установите калиброваный вес на весы, и введите этот вес в поле диалога"
                                     android:key="@string/KEY_POINT2" android:inputType="number"/>
                 <EditTextPreference android:title="Максимальный вес"

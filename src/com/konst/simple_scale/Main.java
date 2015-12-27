@@ -12,7 +12,6 @@ import com.konst.module.ScaleModule;
  * @author Kostya
  */
 public class Main extends Application {
-    private static Main singleton;
     private ScaleModule scaleModule;
     private BootModule bootModule;
     /**
@@ -67,10 +66,6 @@ public class Main extends Application {
         return stepMeasuring;
     }
 
-    public Main getInstance(){
-        return singleton;
-    }
-
     public void setBootModule(BootModule bootModule) {
         this.bootModule = bootModule;
     }
@@ -95,7 +90,6 @@ public class Main extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        singleton = this;
         /*PreferenceManager.setDefaultValues(this, R.xml.preferences, false);*/
         try {
             PackageManager packageManager = getPackageManager();

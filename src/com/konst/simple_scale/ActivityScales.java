@@ -47,8 +47,9 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     private Vibrator vibrator; //вибратор
     private LinearLayout layoutScale;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
-    //final AutoWeight autoWeight = new AutoWeight();
     private ScaleModule scaleModule;
+    private BatteryTemperatureCallback batteryTemperatureCallback = null;
+    private WeightCallback weightCallback = null;
 
     public int numStable;
     private int moduleWeight;
@@ -98,16 +99,18 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     @Override
     protected void onResume() {
         super.onResume();
-        scaleModule.startMeasuringBatteryTemperature();
-        scaleModule.startMeasuringWeight();
+        startThread();
+        scaleModule.startMeasuringBatteryTemperature(batteryTemperatureCallback);
+        scaleModule.startMeasuringWeight(weightCallback);
         screenUnlock();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        scaleModule.stopMeasuringBatteryTemperature(false);
-        scaleModule.stopMeasuringWeight(true);
+        scaleModule.stopMeasuringBatteryTemperature();
+        scaleModule.stopMeasuringWeight();
+        stopThread();
     }
 
     /**
@@ -117,11 +120,16 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
+        Thread.setDefaultUncaughtExceptionHandler(new ReportHelper(this));
         setContentView(R.layout.scale_green);
 
         main = (Main)getApplication();
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        progressBarWeight = (ProgressBar) findViewById(R.id.progressBarWeight);
+        progressBarStable = (ProgressBar)findViewById(R.id.progressBarStable);
+        weightTextView = (TextView) findViewById(R.id.weightTextView);
 
         layoutScale = (LinearLayout)findViewById(R.id.screenScale);
         layoutScale.setVisibility(View.INVISIBLE);
@@ -203,6 +211,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         //connectScaleModule(Preferences.read(getString(R.string.KEY_LAST_SCALES), ""));
         try {
             scaleModule = new ScaleModule(main.getPackageInfo().versionName, connectResultCallback);
+            //scaleModule = new ScaleModule(main.getPackageInfo().versionName, handlerConnect);
             main.setScaleModule(scaleModule);
             scaleModule.setTimerNull(main.getPreferencesScale().read(getString(R.string.KEY_TIMER_NULL), getResources().getInteger(R.integer.default_max_time_auto_null)));
             scaleModule.setWeightError(main.getPreferencesScale().read(getString(R.string.KEY_MAX_NULL), getResources().getInteger(R.integer.default_limit_auto_null)));
@@ -229,7 +238,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
             @Override
             public void run() {
                 doubleBackToExitPressedOnce = false;
-
             }
         }, 2000);
     }
@@ -295,7 +303,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //AlertDialog.Builder dialog;
         setProgressBarIndeterminateVisibility(false);
         switch (resultCode) {
             case RESULT_OK:
@@ -305,7 +312,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 //scaleModule.obtainMessage(RESULT_CANCELED, "Connect error").sendToTarget();
                 break;
             default:
-
         }
     }
 
@@ -324,21 +330,17 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
 
     private void setupWeightView() {
 
-        progressBarWeight = (ProgressBar) findViewById(R.id.progressBarWeight);
+        //progressBarWeight = (ProgressBar) findViewById(R.id.progressBarWeight);
         progressBarWeight.setMax(scaleModule.getMarginTenzo());
         progressBarWeight.setSecondaryProgress(scaleModule.getLimitTenzo());
 
-        progressBarStable = (ProgressBar)findViewById(R.id.progressBarStable);
+        //progressBarStable = (ProgressBar)findViewById(R.id.progressBarStable);
         progressBarStable.setMax(COUNT_STABLE);
         progressBarStable.setProgress(numStable = 0);
 
-        //weightTextView = new TextView(this);
-        weightTextView = (TextView) findViewById(R.id.weightTextView);
-        //weightTextView.setMax(COUNT_STABLE);
-        //weightTextView.setSecondaryProgress(numStable = 0);
 
-        //textLog = (TextView)findViewById(R.id.textLog);
-        //textLog.setTextSize(getResources().getDimension(R.dimen.text_micro));
+        //weightTextView = (TextView) findViewById(R.id.weightTextView);
+
 
         dProgressWeight = getResources().getDrawable(R.drawable.progress_weight);
         dWeightDanger = getResources().getDrawable(R.drawable.progress_weight_danger);
@@ -404,8 +406,8 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
      * Открыть активность поиска весов.
      */
     private void openSearch() {
-        scaleModule.stopMeasuringWeight(true);
-        scaleModule.stopMeasuringBatteryTemperature(true);
+        scaleModule.stopMeasuringWeight();
+        scaleModule.stopMeasuringBatteryTemperature();
         stopThread();
         //scaleModule.removeCallbacksAndMessages(null);
         scaleModule.dettach();
@@ -464,10 +466,12 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
             unregisterReceiver(broadcastReceiver);
         scaleModule.dettach();
         scaleModule.getAdapter().disable();
-        while (scaleModule.getAdapter().isEnabled()) ;
-        int pid = android.os.Process.myPid();
-        android.os.Process.killProcess(pid);
+        while (scaleModule.getAdapter().isEnabled());
         System.exit(0);
+        //int pid = android.os.Process.myPid();
+        //android.os.Process.killProcess(pid);
+
+        //System.runFinalization();
     }
 
     private void wakeUp(){
@@ -496,8 +500,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 public void run() {
                     switch (resultConnect) {
                         case STATUS_LOAD_OK:
-                            scaleModule.setWeightCallback(weightCallback);
-                            scaleModule.setBatteryTemperatureCallback(batteryTemperatureCallback);
                             try {
                                 setTitle(getString(R.string.app_name) + " \"" + scaleModule.getNameBluetoothDevice() + "\", v." + scaleModule.getNumVersion()); //установить заголовок
                             } catch (Exception e) {
@@ -506,8 +508,10 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                             main.getPreferencesScale().write(getString(R.string.KEY_LAST_SCALES), scaleModule.getAddressBluetoothDevice());
                             setupListView();
                             setupWeightView();
-                            scaleModule.startMeasuringWeight();
-                            scaleModule.startMeasuringBatteryTemperature();
+                            batteryTemperatureCallback = new BatteryTemperatureCallback();
+                            weightCallback = new WeightCallback();
+                            scaleModule.startMeasuringWeight(weightCallback);
+                            scaleModule.startMeasuringBatteryTemperature(batteryTemperatureCallback);
                             startThread();
                             break;
                         case STATUS_VERSION_UNKNOWN:
@@ -604,104 +608,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         }
     };
 
-    /**
-     * Обработчик показаний веса.
-     * Возвращяем время обновления показаний веса в милисекундах.
-     */
-    ScaleModule.WeightCallback weightCallback = new ScaleModule.WeightCallback() {
-        /** Сообщение показаний веса.
-         * @param what Результат статуса сообщения энумератор ResultWeight.
-         * @param weight Данные веса в килограмах.
-         * @param sensor Данные показания сенсорного датчика.
-         * @return Время обновления показаний в милисекундах.
-         */
-         @Override
-         public int weight(ScaleModule.ResultWeight what, int weight, int sensor) {
-                    moduleWeight = getWeightToStepMeasuring(weight);
-
-                    runOnUiThread(new Runnable() {
-                        Rect bounds,bounds1;
-                        SpannableStringBuilder w;
-                        final String textWeight = String.valueOf(moduleWeight);
-                        @Override
-                        public void run() {
-
-                            switch (what) {
-                                case WEIGHT_NORMAL:
-                                    w = new SpannableStringBuilder(textWeight);
-                                    w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_big)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    w.setSpan(new ForegroundColorSpan(Color.WHITE), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    w.append(textKg);
-                                    progressBarWeight.setProgress(sensor);
-                                    bounds = progressBarWeight.getProgressDrawable().getBounds();
-                                    progressBarWeight.setProgressDrawable(dProgressWeight);
-                                    progressBarWeight.getProgressDrawable().setBounds(bounds);
-                                    break;
-                                case WEIGHT_LIMIT:
-                                    w = new SpannableStringBuilder(textWeight);
-                                    w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_big)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    w.setSpan(new ForegroundColorSpan(Color.RED), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    w.append(textKg);
-                                    progressBarWeight.setProgress(sensor);
-                                    bounds = progressBarWeight.getProgressDrawable().getBounds();
-                                    progressBarWeight.setProgressDrawable(dWeightDanger);
-                                    progressBarWeight.getProgressDrawable().setBounds(bounds);
-                                    break;
-                                case WEIGHT_MARGIN:
-                                    w = new SpannableStringBuilder(getString(R.string.OVER_LOAD));
-                                    w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_large_xx)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    w.setSpan(new ForegroundColorSpan(Color.RED), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    progressBarWeight.setProgress(sensor);
-                                    vibrator.vibrate(100);
-                                    break;
-                                case WEIGHT_ERROR:
-                                    w = new SpannableStringBuilder(getString(R.string.NO_CONNECT));
-                                    w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_large_xx)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    w.setSpan(new ForegroundColorSpan(Color.RED), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                                    moduleWeight = 0;
-                                    progressBarWeight.setProgress(0);
-                                    break;
-                                default:
-                            }
-                            weightTextView.setText(w, TextView.BufferType.SPANNABLE);
-                            //weightTextView.setText("120");
-                            //weightTextView.setVisibility(View.VISIBLE);
-                            //weightTextView.setTextColor(Color.WHITE);
-                        }
-                    });
-                    return 50; // Обновляем через милисикунды
-                }
-    };
-
-    /** Обработчик показаний заряда батареи и температуры.
-     * Возвращяет время обновления в секундах.
-     */
-    ScaleModule.BatteryTemperatureCallback batteryTemperatureCallback = new ScaleModule.BatteryTemperatureCallback() {
-        /** Сообщение
-         * @param battery Заряд батареи в процентах.
-         * @param temperature Температура в градусах.
-         * @return Время обновления показаний заряда батареи и температуры в секундах.*/
-        @Override
-        public int batteryTemperature(int battery, int temperature) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (battery > 15) {
-                        textViewBattery.setText("заряд батареи " + battery + '%' + " t- " + temperature + '°' + 'C');
-                        textViewBattery.setTextColor(Color.WHITE);
-                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery, 0, 0, 0);
-                    } else if (battery > 0) {
-                        textViewBattery.setText("заряд низкий!!! " + battery + '%' + " t- " + temperature + '°' + 'C');
-                        textViewBattery.setTextColor(Color.RED);
-                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery_red, 0, 0, 0);
-                    }
-
-                }
-            });
-            return 5000; //Обновляется через милисекунд.
-        }
-    };
-
     @Override
     public void run() {
         handler.obtainMessage(Action.START.ordinal()).sendToTarget();
@@ -757,34 +663,15 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                     break;
                 case STORE_WEIGHTING:
                     vibrator.vibrate(100);
-                    /*StringBuilder stringBuilder = new StringBuilder();
-                    Date date = new Date();
-                    if(msg.arg2 == 0)
-                        stringBuilder.append("А--");
-                    else
-                        stringBuilder.append("Р--");
-                    stringBuilder.append(msg.arg1 + getString(R.string.scales_kg)).append(" ");
-
-                    stringBuilder.append("(").append(new SimpleDateFormat("dd.MM.yyyy").format(date)).append("--");
-                    stringBuilder.append(new SimpleDateFormat("HH:mm:ss").format(date)).append(")").append('\n');*/
                     arrayList.add(new WeightObject(msg.arg1));
                     customListAdapter.notifyDataSetChanged();
-                    //log(stringBuilder.toString());
-                    //buttonFinish.setEnabled(true);
-                    //buttonFinish.setAlpha(255);
                     break;
                 case START:
                 case STOP_WEIGHTING:
-                    //weightTypeUpdate();
-                    //buttonFinish.setEnabled(true);
-                    //buttonFinish.setAlpha(255);
-                    //((OnCheckEventListener) mTabsAdapter.getCurrentFragment()).someEvent();todo
                     progressBarStable.setProgress(0);
                     flagExit = true;
                     break;
                 case START_WEIGHTING:
-                    //buttonFinish.setEnabled(false);
-                    //buttonFinish.setAlpha(100);
                     flagExit = false;
                     break;
                 default:
@@ -823,6 +710,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     public void startThread(){
         running = true;
         threadAutoWeight = new Thread(this);
+        //threadAutoWeight.setDaemon(true);
         threadAutoWeight.start();
     }
 
@@ -890,7 +778,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         public String getTime() { return time;  }
     }
 
-    public void removeAtomPayOnClickHandler(View view) {
+    public void removeWeightOnClick(View view) {
 
         //ListView list = getListView();
         int position = listView.getPositionForView(view);
@@ -899,6 +787,135 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         customListAdapter.notifyDataSetChanged();
     }
 
+    /** Класс обработчик показаний заряда батареи и температуры. */
+    class  BatteryTemperatureCallback implements ScaleModule.BatteryTemperatureCallback {
+        /** Сообщение
+         * @param battery Заряд батареи в процентах.
+         * @param temperature Температура в градусах.*/
+        @Override
+        public void batteryTemperature(int battery, int temperature) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (battery > 15) {
+                        textViewBattery.setText("заряд батареи " + battery + '%' + "   " + temperature + '°' + 'C');
+                        textViewBattery.setTextColor(Color.WHITE);
+                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery, 0, 0, 0);
+                    } else if (battery >= 0) {
+                        textViewBattery.setText("заряд низкий!!! " + battery + '%' + "   " + temperature + '°' + 'C');
+                        textViewBattery.setTextColor(Color.RED);
+                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery_red, 0, 0, 0);
+                    }else {
+                        textViewBattery.setText("нет данных!!! " + '%' + "   " + temperature + '°' + 'C');
+                        textViewBattery.setTextColor(Color.BLUE);
+                        textViewBattery.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_action_battery_red, 0, 0, 0);
+                    }
 
+                }
+            });
+        }
+    };
+
+    /** Класс обработки показаний веса. */
+    class WeightCallback implements ScaleModule.WeightCallback{
+
+        /** Сообщение показаний веса.
+         *  @param what Результат статуса сообщения энумератор ResultWeight.
+         *  @param weight Данные веса в килограмах.
+         *  @param sensor Данные показания сенсорного датчика.
+         */
+        @Override
+        public void weight(ScaleModule.ResultWeight what, int weight, int sensor) {
+            moduleWeight = getWeightToStepMeasuring(weight);
+            runOnUiThread(new Runnable() {
+                Rect bounds;
+                SpannableStringBuilder w;
+                final String textWeight = String.valueOf(moduleWeight);
+                @Override
+                public void run() {
+                    switch (what) {
+                        case WEIGHT_NORMAL:
+                            w = new SpannableStringBuilder(textWeight);
+                            w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_big)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            w.setSpan(new ForegroundColorSpan(Color.WHITE), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            w.append(textKg);
+                            progressBarWeight.setProgress(sensor);
+                            bounds = progressBarWeight.getProgressDrawable().getBounds();
+                            progressBarWeight.setProgressDrawable(dProgressWeight);
+                            progressBarWeight.getProgressDrawable().setBounds(bounds);
+                            break;
+                        case WEIGHT_LIMIT:
+                            w = new SpannableStringBuilder(textWeight);
+                            w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_big)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            w.setSpan(new ForegroundColorSpan(Color.RED), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            w.append(textKg);
+                            progressBarWeight.setProgress(sensor);
+                            bounds = progressBarWeight.getProgressDrawable().getBounds();
+                            progressBarWeight.setProgressDrawable(dWeightDanger);
+                            progressBarWeight.getProgressDrawable().setBounds(bounds);
+                            break;
+                        case WEIGHT_MARGIN:
+                            w = new SpannableStringBuilder(getString(R.string.OVER_LOAD));
+                            w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_large_xx)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            w.setSpan(new ForegroundColorSpan(Color.RED), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            progressBarWeight.setProgress(sensor);
+                            vibrator.vibrate(100);
+                            break;
+                        case WEIGHT_ERROR:
+                            w = new SpannableStringBuilder(getString(R.string.NO_CONNECT));
+                            w.setSpan(new AbsoluteSizeSpan(getResources().getDimensionPixelSize(R.dimen.text_large_xx)), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            w.setSpan(new ForegroundColorSpan(Color.RED), 0, w.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                            moduleWeight = 0;
+                            progressBarWeight.setProgress(0);
+                            break;
+                        default:
+                    }
+                    weightTextView.setText(w, TextView.BufferType.SPANNABLE);
+                    //weightTextView.setText("120");
+                    //weightTextView.setVisibility(View.VISIBLE);
+                    //weightTextView.setTextColor(Color.WHITE);
+                }
+            });
+        }
+    }
+
+    public class ReportHelper implements Thread.UncaughtExceptionHandler {
+        private AlertDialog dialog;
+        private Context context;
+
+        public ReportHelper(Context context) {
+            this.context = context;
+        }
+
+        @Override
+        public void uncaughtException(Thread thread, Throwable ex) {
+            showToastInThread(ex.getMessage());
+        }
+
+        public void showToastInThread(final String str){
+            new Thread() {
+                @Override
+                public void run() {
+                    Looper.prepare();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(str)
+                            .setTitle("Ошибка приложения")
+                            .setCancelable(false)
+                            .setNegativeButton("Выход", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                    exit();
+                                }
+                            });
+                    dialog = builder.create();
+
+                    //Toast.makeText(context, str, Toast.LENGTH_LONG).show();
+                    if(!dialog.isShowing())
+                        dialog.show();
+                    Looper.loop();
+                }
+            }.start();
+        }
+    }
 
 }

@@ -147,7 +147,7 @@ public class ActivityTuning extends PreferenceActivity {
                             Toast.makeText(context, R.string.preferences_no, Toast.LENGTH_SHORT).show();
                             return false;
                         }
-                        if (scaleModule.setModuleBatteryCharge(0)) {
+                        if (scaleModule.setModuleBatteryCharge(Integer.valueOf(o.toString()))) {
                             scaleModule.setBattery(Integer.valueOf(o.toString()));
                             preference.setTitle(context.getString(R.string.Battery) + scaleModule.getBattery() + '%');
                             Toast.makeText(context, R.string.preferences_yes, Toast.LENGTH_SHORT).show();
@@ -192,10 +192,8 @@ public class ActivityTuning extends PreferenceActivity {
                 if (scaleModule.getVersion() != null) {
                     if (scaleModule.getNumVersion() < main.microSoftware) {
                         name.setSummary(context.getString(R.string.Is_new_version));
-                        //name.setEnabled(true);
                     } else {
                         name.setSummary(context.getString(R.string.Scale_update));
-                        //name.setEnabled(false);
                     }
                 }
                 name.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -215,8 +213,9 @@ public class ActivityTuning extends PreferenceActivity {
 
                         if (scaleModule.isAttach()){
                             if(scaleModule.setModulePowerOff())
-                                intent.putExtra("power_off", true);
+                                intent.putExtra("com.konst.simple_scale.POWER", true);
                         }
+                        scaleModule.dettach();
                         context.startActivity(intent);
                         return false;
                     }

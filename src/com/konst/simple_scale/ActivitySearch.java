@@ -34,7 +34,6 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
     private final AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
             if (module.getAdapter().isDiscovering()) {
                 module.getAdapter().cancelDiscovery();
             }
@@ -286,8 +285,10 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
                         case STATUS_ATTACH_FINISH:
                             listView.setEnabled(true);
                             //setProgressBarIndeterminateVisibility(false);
-                            if (dialogSearch.isShowing()) {
-                                dialogSearch.dismiss();
+                            if (dialogSearch != null){
+                                if (dialogSearch.isShowing()) {
+                                    dialogSearch.dismiss();
+                                }
                             }
                             break;
                         default:
