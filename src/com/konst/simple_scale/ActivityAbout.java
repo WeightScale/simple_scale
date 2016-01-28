@@ -14,7 +14,7 @@ import com.konst.module.ScaleModule;
  * Created by Kostya on 26.04.14.
  */
 public class ActivityAbout extends Activity {
-    private static Main main;
+    private static Globals globals;
     private  static ScaleModule scaleModule;
     enum StrokeSettings{
         VERSION(R.string.Version_scale){
@@ -49,7 +49,7 @@ public class ActivityAbout extends Activity {
         TEMPERATURE(R.string.Temperature) {
             @Override
             String getValue() {
-                return scaleModule.isAttach()?scaleModule.getModuleTemperature() + "°" + 'C' :"error"+ '\n';
+                return globals.isScaleConnect()?scaleModule.getModuleTemperature() + "°" + 'C' :"error"+ '\n';
             }
 
             @Override
@@ -81,7 +81,7 @@ public class ActivityAbout extends Activity {
         STEP(R.string.Step_capacity_scale){
             final int resIdKg = R.string.scales_kg;
             @Override
-            String getValue() { return main.getStepMeasuring() + " "; }
+            String getValue() { return globals.getStepMeasuring() + " "; }
 
             @Override
             int getMeasure() {  return resIdKg; }
@@ -104,15 +104,15 @@ public class ActivityAbout extends Activity {
         setContentView(R.layout.about);
         setTitle(getString(R.string.About));
 
-        main = (Main)getApplication();
-        scaleModule = main.getScaleModule();
+        globals = Globals.getInstance();
+        scaleModule = globals.getScaleModule();
 
         WindowManager.LayoutParams lp = getWindow().getAttributes();
         lp.screenBrightness = 1.0f;
         getWindow().setAttributes(lp);
 
         TextView textSoftVersion = (TextView) findViewById(R.id.textSoftVersion);
-        textSoftVersion.setText(main.getPackageInfo().versionName + ' ' + String.valueOf(main.getPackageInfo().versionCode));
+        textSoftVersion.setText(globals.getPackageInfo().versionName + ' ' + String.valueOf(globals.getPackageInfo().versionCode));
 
         TextView textSettings = (TextView) findViewById(R.id.textSettings);
         parserTextSettings(textSettings);

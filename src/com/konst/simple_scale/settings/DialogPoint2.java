@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.konst.module.ScaleModule;
-import com.konst.simple_scale.Main;
+import com.konst.simple_scale.Globals;
 import com.konst.simple_scale.R;
 
 /**
@@ -25,7 +25,7 @@ public class DialogPoint2 extends DialogPreference implements ScaleModule.Weight
         mContext = context;
         setPersistent(false);
         setDialogLayoutResource(R.layout.dialog_point2);
-        scaleModule = ((Main)context.getApplicationContext()).getScaleModule();
+        scaleModule = Globals.getInstance().getScaleModule();
         //scaleModule.setWeightCallback(this);
     }
 

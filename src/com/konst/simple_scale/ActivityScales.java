@@ -1,9 +1,6 @@
 package com.konst.simple_scale;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.KeyguardManager;
-import android.app.ProgressDialog;
+import android.app.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.*;
@@ -13,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.*;
+import android.support.v4.app.NotificationCompat;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.AbsoluteSizeSpan;
@@ -31,7 +29,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class ActivityScales extends Activity implements View.OnClickListener, Runnable{
-    private Main main;
+    private Globals globals;
     private SpannableStringBuilder textKg;
     private SpannableStringBuilder textBattery;
     private TextView textViewBattery;
@@ -68,7 +66,6 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     private boolean touchWeightView;
     private boolean weightViewIsSwipe;
     private boolean doubleBackToExitPressedOnce;
-    public static boolean isScaleConnect;
 
     enum Action{
         /** Остановка взвешивания.          */
@@ -123,7 +120,8 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         Thread.setDefaultUncaughtExceptionHandler(new ReportHelper(this));
         setContentView(R.layout.scale_green);
 
-        main = (Main)getApplication();
+        globals = Globals.getInstance();
+        globals.initialize(this);
 
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -189,11 +187,11 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                             break;
                         case BluetoothDevice.ACTION_ACL_DISCONNECTED://устройство отсоеденено
                             vibrator.vibrate(200);
-                            isScaleConnect = false;
+                            globals.setScaleConnect(false);
                             break;
                         case BluetoothDevice.ACTION_ACL_CONNECTED://найдено соеденено
                             vibrator.vibrate(200);
-                            isScaleConnect = true;
+                            globals.setScaleConnect(true);
                             break;
                         default:
                     }
@@ -210,13 +208,13 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
         //Toast.makeText(getBaseContext(), R.string.bluetooth_off, Toast.LENGTH_SHORT).show();
         //connectScaleModule(Preferences.read(getString(R.string.KEY_LAST_SCALES), ""));
         try {
-            scaleModule = new ScaleModule(main.getPackageInfo().versionName, connectResultCallback);
+            scaleModule = new ScaleModule(globals.getPackageInfo().versionName, connectResultCallback);
             //scaleModule = new ScaleModule(main.getPackageInfo().versionName, handlerConnect);
-            main.setScaleModule(scaleModule);
-            scaleModule.setTimerNull(main.getPreferencesScale().read(getString(R.string.KEY_TIMER_NULL), getResources().getInteger(R.integer.default_max_time_auto_null)));
-            scaleModule.setWeightError(main.getPreferencesScale().read(getString(R.string.KEY_MAX_NULL), getResources().getInteger(R.integer.default_limit_auto_null)));
+            globals.setScaleModule(scaleModule);
+            scaleModule.setTimerNull(globals.getPreferencesScale().read(getString(R.string.KEY_TIMER_NULL), getResources().getInteger(R.integer.default_max_time_auto_null)));
+            scaleModule.setWeightError(globals.getPreferencesScale().read(getString(R.string.KEY_MAX_NULL), getResources().getInteger(R.integer.default_limit_auto_null)));
             Toast.makeText(getBaseContext(), R.string.bluetooth_off, Toast.LENGTH_SHORT).show();
-            connectScaleModule(main.getPreferencesScale().read(getString(R.string.KEY_LAST_SCALES), ""));
+            connectScaleModule(globals.getPreferencesScale().read(getString(R.string.KEY_LAST_SCALES), ""));
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             finish();
@@ -279,7 +277,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if (i == DialogInterface.BUTTON_POSITIVE) {
-                            if (scaleModule.isAttach())
+                            if (globals.isScaleConnect())
                                 scaleModule.setModulePowerOff();
                         }
                     }
@@ -423,12 +421,12 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
      */
     public boolean isCapture() {
         boolean capture = false;
-        while (getWeightToStepMeasuring(moduleWeight) > main.getAutoCapture()) {
+        while (getWeightToStepMeasuring(moduleWeight) > globals.getAutoCapture()) {
             if (capture) {
                 return true;
             } else {
                 try {
-                    TimeUnit.SECONDS.sleep(Main.timeDelayDetectCapture);
+                    TimeUnit.SECONDS.sleep(globals.timeDelayDetectCapture);
                 } catch (InterruptedException ignored) {
                 }
                 capture = true;
@@ -438,7 +436,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     }
 
     public boolean processStable(int weight) {
-        if (tempWeight - main.getStepMeasuring() <= weight && tempWeight + main.getStepMeasuring() >= weight) {
+        if (tempWeight - globals.getStepMeasuring() <= weight && tempWeight + globals.getStepMeasuring() >= weight) {
             if (++numStable >= COUNT_STABLE) {
                 return true;
             }
@@ -457,7 +455,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
      * @return Преобразованый вес.
      */
     private int getWeightToStepMeasuring(int weight) {
-        return weight / main.getStepMeasuring() * main.getStepMeasuring();
+        return weight / globals.getStepMeasuring() * globals.getStepMeasuring();
     }
 
     protected void exit() {
@@ -505,7 +503,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                             } catch (Exception e) {
                                 setTitle(getString(R.string.app_name) + " , v." + scaleModule.getNumVersion()); //установить заголовок
                             }
-                            main.getPreferencesScale().write(getString(R.string.KEY_LAST_SCALES), scaleModule.getAddressBluetoothDevice());
+                            globals.getPreferencesScale().write(getString(R.string.KEY_LAST_SCALES), scaleModule.getAddressBluetoothDevice());
                             setupListView();
                             setupWeightView();
                             batteryTemperatureCallback = new BatteryTemperatureCallback();
@@ -638,8 +636,8 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 handler.obtainMessage(Action.STORE_WEIGHTING.ordinal(), moduleWeight, 0).sendToTarget();                 //сохраняем стабильный вес
             }
 
-            while (running && !((moduleWeight >= tempWeight + Main.default_min_auto_capture)
-                    || (moduleWeight <= tempWeight- Main.default_min_auto_capture))) {
+            while (running && !((moduleWeight >= tempWeight + globals.default_min_auto_capture)
+                    || (moduleWeight <= tempWeight- globals.default_min_auto_capture))) {
                 try { Thread.sleep(50); } catch (InterruptedException ignored) {}                                       // ждем изменения веса
             }
 
@@ -916,6 +914,15 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 }
             }.start();
         }
+    }
+
+    void showNotify(){
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.mipmap.ic_launcher);
+        mBuilder.setContentTitle("test").build();
+        mBuilder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, ActivityScales.class), PendingIntent.FLAG_UPDATE_CURRENT));
+        NotificationManager mNotificationManager =  (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mBuilder.build());
     }
 
 }

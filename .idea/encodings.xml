@@ -34,8 +34,8 @@
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/ActivitySearch.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/BluetoothListAdapter.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/CustomTextView.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Globals.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Internet.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Main.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/NumberPicker.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Preferences.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/com/konst/simple_scale/Scroller.java" charset="UTF-8" />

@@ -18,7 +18,7 @@ import com.konst.simple_scale.settings.ActivityTuning;
 import java.util.ArrayList;
 
 public class ActivitySearch extends Activity implements View.OnClickListener {
-    private Main main;
+    private Globals globals;
     private Module module;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
     private ArrayList<BluetoothDevice> foundDevice; //чужие устройства
@@ -61,14 +61,14 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         lp.screenBrightness = 1.0f;
         getWindow().setAttributes(lp);
 
-        main = (Main)getApplication();
+        globals = Globals.getInstance();
         textViewLog = (TextView) findViewById(R.id.textLog);
 
         String action = getIntent().getAction();
         if("bootloader".equals(action)){
-            module = main.getBootModule();
+            module = globals.getBootModule();
         }else {
-            module = main.getScaleModule();
+            module = globals.getScaleModule();
         }
         module.setConnectResultCallback(connectResultCallback);
 
@@ -130,8 +130,8 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
 
         foundDevice = new ArrayList<>();
 
-        for (int i = 0; main.getPreferencesScale().contains(getString(R.string.KEY_ADDRESS) + i); i++) { //заполнение списка
-            foundDevice.add(module.getAdapter().getRemoteDevice(main.getPreferencesScale().read(getString(R.string.KEY_ADDRESS) + i, "")));
+        for (int i = 0; globals.getPreferencesScale().contains(getString(R.string.KEY_ADDRESS) + i); i++) { //заполнение списка
+            foundDevice.add(module.getAdapter().getRemoteDevice(globals.getPreferencesScale().read(getString(R.string.KEY_ADDRESS) + i, "")));
         }
         bluetoothAdapter = new BluetoothListAdapter(this, foundDevice);
 
@@ -162,11 +162,11 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
         }
         unregisterReceiver(broadcastReceiver);
 
-        for (int i = 0; main.getPreferencesScale().contains(getString(R.string.KEY_ADDRESS) + i); i++) { //стереть прошлый список
-            main.getPreferencesScale().remove(getString(R.string.KEY_ADDRESS) + i);
+        for (int i = 0; globals.getPreferencesScale().contains(getString(R.string.KEY_ADDRESS) + i); i++) { //стереть прошлый список
+            globals.getPreferencesScale().remove(getString(R.string.KEY_ADDRESS) + i);
         }
         for (int i = 0; i < foundDevice.size(); i++) { //сохранить новый список
-            main.getPreferencesScale().write(getString(R.string.KEY_ADDRESS) + i, ((BluetoothDevice) foundDevice.toArray()[i]).getAddress());
+            globals.getPreferencesScale().write(getString(R.string.KEY_ADDRESS) + i, ((BluetoothDevice) foundDevice.toArray()[i]).getAddress());
         }
 
     }
@@ -267,7 +267,7 @@ public class ActivitySearch extends Activity implements View.OnClickListener {
                             finish();
                             break;
                         case STATUS_VERSION_UNKNOWN:
-                            log(module.getNameBluetoothDevice() + " " + getString(R.string.not_scale)+((Main)getApplication()).getPackageInfo().versionName);
+                            log(module.getNameBluetoothDevice() + " " + getString(R.string.not_scale)+globals.getPackageInfo().versionName);
                             break;
                         case STATUS_ATTACH_START:
                             listView.setEnabled(false);

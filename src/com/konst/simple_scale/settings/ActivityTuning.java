@@ -20,7 +20,7 @@ import android.widget.*;
 import com.konst.module.Commands;
 import com.konst.module.InterfaceVersions;
 import com.konst.module.ScaleModule;
-import com.konst.simple_scale.Main;
+import com.konst.simple_scale.Globals;
 import com.konst.simple_scale.R;
 import com.konst.simple_scale.bootloader.ActivityBootloader;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class ActivityTuning extends PreferenceActivity {
     private static ScaleModule scaleModule;
-    private static Main main;
+    private static Globals globals;
     private static final Point point1 = new Point(Integer.MIN_VALUE, 0);
     private static final Point point2 = new Point(Integer.MIN_VALUE, 0);
     private static boolean flag_restore;
@@ -42,7 +42,7 @@ public class ActivityTuning extends PreferenceActivity {
         POINT1(R.string.KEY_POINT1){
             @Override
             void setup(Preference name) throws Exception {
-                if(!scaleModule.isAttach())
+                if(!globals.isScaleConnect())
                     throw new Exception(" ");
                 name.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                     @Override
@@ -66,7 +66,7 @@ public class ActivityTuning extends PreferenceActivity {
         POINT2(R.string.KEY_POINT2){
             @Override
             void setup(Preference name) throws Exception {
-                if(!scaleModule.isAttach())
+                if(!globals.isScaleConnect())
                     throw new Exception(" ");
                 name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
@@ -163,7 +163,7 @@ public class ActivityTuning extends PreferenceActivity {
         SERVICE_COD(R.string.KEY_SERVICE_COD){
             @Override
             void setup(Preference name) throws Exception {
-                if(!scaleModule.isAttach())
+                if(!globals.isScaleConnect())
                     throw new Exception(" ");
                 name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                     @Override
@@ -190,7 +190,7 @@ public class ActivityTuning extends PreferenceActivity {
             void setup(Preference name) throws Exception {
                 Context context = name.getContext();
                 if (scaleModule.getVersion() != null) {
-                    if (scaleModule.getNumVersion() < main.microSoftware) {
+                    if (scaleModule.getNumVersion() < globals.microSoftware) {
                         name.setSummary(context.getString(R.string.Is_new_version));
                     } else {
                         name.setSummary(context.getString(R.string.Scale_update));
@@ -207,11 +207,11 @@ public class ActivityTuning extends PreferenceActivity {
                         else
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra(context.getString(R.string.KEY_ADDRESS), scaleModule.isAttach()? scaleModule.getAddressBluetoothDevice():"");
+                        intent.putExtra(context.getString(R.string.KEY_ADDRESS), globals.isScaleConnect()? scaleModule.getAddressBluetoothDevice():"");
                         intent.putExtra(Commands.CMD_HARDWARE.getName(), hardware);
                         intent.putExtra(Commands.CMD_VERSION.getName(), scaleModule.getNumVersion());
 
-                        if (scaleModule.isAttach()){
+                        if (globals.isScaleConnect()){
                             if(scaleModule.setModulePowerOff())
                                 intent.putExtra("com.konst.simple_scale.POWER", true);
                         }
@@ -236,8 +236,8 @@ public class ActivityTuning extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        main = (Main)getApplication();
-        scaleModule = main.getScaleModule();
+        globals = Globals.getInstance();
+        scaleModule = globals.getScaleModule();
         /*PreferenceManager preferenceManager = getPreferenceManager();
         preferenceManager.setSharedPreferencesName("my_preferences");
         preferenceManager.setSharedPreferencesMode(MODE_PRIVATE);*/

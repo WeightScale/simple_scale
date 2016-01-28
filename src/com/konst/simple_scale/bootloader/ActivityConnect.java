@@ -23,8 +23,8 @@ import android.widget.Toast;
 import com.konst.module.BootModule;
 import com.konst.module.ConnectResultCallback;
 import com.konst.module.Module;
+import com.konst.simple_scale.Globals;
 import com.konst.simple_scale.Internet;
-import com.konst.simple_scale.Main;
 import com.konst.simple_scale.R;
 
 public class ActivityConnect extends Activity implements View.OnClickListener {
@@ -52,7 +52,7 @@ public class ActivityConnect extends Activity implements View.OnClickListener {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.connect);
         textViewLog = (TextView) findViewById(R.id.textLog);
-        bootModule = ((Main)getApplication()).getBootModule();
+        bootModule = Globals.getInstance().getBootModule();
         log(R.string.bluetooth_off, true);
         setupScale();
         /*try {
