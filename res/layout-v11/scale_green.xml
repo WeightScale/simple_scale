@@ -26,6 +26,7 @@
                              android:layout_marginRight="@dimen/padding"
                              android:progressDrawable="@drawable/progress_stable"
                              android:layout_marginTop="@dimen/padding"/>
+
                 <LinearLayout android:layout_width="fill_parent"
                               android:layout_height="wrap_content"
                               android:id="@+id/linearLayout"
@@ -49,15 +50,30 @@
                          android:layout_marginBottom="@dimen/padding" android:layout_marginLeft="@dimen/padding"
                          android:layout_marginRight="@dimen/padding"/>
         </LinearLayout>
-        <TextView android:id="@+id/textBattery"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:textAppearance="?android:attr/textAppearanceMedium"
-                  android:textStyle="bold" android:textColor="@color/white"
-                  android:drawableLeft="@drawable/ic_action_battery"
-                  android:textSize="@dimen/text_small" android:gravity="center"
-                  android:background="@color/greenEnd">
-        </TextView>
+
+        <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/greenEnd">
+
+            <TextView android:id="@+id/textBattery"
+                      android:layout_width="0dp"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="?android:attr/textAppearanceMedium"
+                      android:textStyle="bold" android:textColor="@color/white"
+                      android:drawableLeft="@drawable/ic_action_battery"
+                      android:textSize="@dimen/text_small" android:gravity="center"
+                      android:layout_weight="1">
+            </TextView>
+
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/imageViewWait"
+                    android:src="@drawable/ic_action_wait_measure"/>
+        </LinearLayout>
+
         <LinearLayout android:orientation="horizontal"
                       android:layout_width="fill_parent"
                       android:layout_height="0dp"
@@ -71,7 +87,7 @@
     <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content" android:background="@color/background2">
+            android:layout_height="wrap_content" android:background="@color/greenEnd">
         <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

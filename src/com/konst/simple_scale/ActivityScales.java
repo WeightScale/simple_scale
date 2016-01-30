@@ -41,13 +41,13 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     private TextView weightTextView;
     private Drawable dProgressWeight, dWeightDanger;
     private SimpleGestureFilter detectorWeightView;
-    private ImageView buttonFinish;
+    private ImageView buttonFinish, imageViewWait;
     private Vibrator vibrator; //вибратор
     private LinearLayout layoutScale;
     private BroadcastReceiver broadcastReceiver; //приёмник намерений
     private ScaleModule scaleModule;
-    private BatteryTemperatureCallback batteryTemperatureCallback = null;
-    private WeightCallback weightCallback = null;
+    //private BatteryTemperatureCallback batteryTemperatureCallback = null;
+    //private WeightCallback weightCallback = null;
 
     public int numStable;
     private int moduleWeight;
@@ -134,6 +134,9 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
 
         buttonFinish = (ImageView) findViewById(R.id.buttonFinish);
         buttonFinish.setOnClickListener(this);
+
+        imageViewWait = (ImageView)findViewById(R.id.imageViewWait);
+
 
         textViewBattery = (TextView)findViewById(R.id.textBattery);
 
@@ -506,8 +509,8 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                             globals.getPreferencesScale().write(getString(R.string.KEY_LAST_SCALES), scaleModule.getAddressBluetoothDevice());
                             setupListView();
                             setupWeightView();
-                            batteryTemperatureCallback = new BatteryTemperatureCallback();
-                            weightCallback = new WeightCallback();
+                            //batteryTemperatureCallback = new BatteryTemperatureCallback();
+                            //weightCallback = new WeightCallback();
                             scaleModule.startMeasuringWeight(weightCallback);
                             scaleModule.startMeasuringBatteryTemperature(batteryTemperatureCallback);
                             startThread();
@@ -642,6 +645,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
             }
 
             handler.obtainMessage(Action.STOP_WEIGHTING.ordinal()).sendToTarget();
+            try { TimeUnit.SECONDS.sleep(1); } catch (InterruptedException e) {}
         }
     }
 
@@ -666,10 +670,12 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                     break;
                 case START:
                 case STOP_WEIGHTING:
+                    imageViewWait.setVisibility(View.VISIBLE);
                     progressBarStable.setProgress(0);
                     flagExit = true;
                     break;
                 case START_WEIGHTING:
+                    imageViewWait.setVisibility(View.INVISIBLE);
                     flagExit = false;
                     break;
                 default:
@@ -706,6 +712,9 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     }
 
     public void startThread(){
+        if(threadAutoWeight != null)
+            if(threadAutoWeight.isAlive())
+                return;
         running = true;
         threadAutoWeight = new Thread(this);
         //threadAutoWeight.setDaemon(true);
@@ -786,7 +795,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     }
 
     /** Класс обработчик показаний заряда батареи и температуры. */
-    class  BatteryTemperatureCallback implements ScaleModule.BatteryTemperatureCallback {
+    ScaleModule.BatteryTemperatureCallback batteryTemperatureCallback = new  ScaleModule.BatteryTemperatureCallback() {
         /** Сообщение
          * @param battery Заряд батареи в процентах.
          * @param temperature Температура в градусах.*/
@@ -815,7 +824,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
     };
 
     /** Класс обработки показаний веса. */
-    class WeightCallback implements ScaleModule.WeightCallback{
+    ScaleModule.WeightCallback weightCallback = new  ScaleModule.WeightCallback(){
 
         /** Сообщение показаний веса.
          *  @param what Результат статуса сообщения энумератор ResultWeight.
@@ -875,7 +884,7 @@ public class ActivityScales extends Activity implements View.OnClickListener, Ru
                 }
             });
         }
-    }
+    };
 
     public class ReportHelper implements Thread.UncaughtExceptionHandler {
         private AlertDialog dialog;
